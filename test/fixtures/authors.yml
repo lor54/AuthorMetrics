@@ -1,0 +1,17 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  id: 1
+  name: MyString
+  surname: MyString
+  hindex: 1.5
+  institution: MyString
+  citationsnumber: 1
+
+two:
+  id: 1
+  name: MyString
+  surname: MyString
+  hindex: 1.5
+  institution: MyString
+  citationsnumber: 1
