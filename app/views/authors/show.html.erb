@@ -1,0 +1,11 @@
+<h1>Autore: </h1>
+<%= @author['name'] %>
+
+<h2>Bibliografia: </h2>
+<ul>
+  <% @author['bibliography'].each do |year| %>
+    <li>
+        <%= year %>
+    </li>
+  <% end %>
+</ul>
