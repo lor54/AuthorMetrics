@@ -5,7 +5,30 @@
 <ul>
   <% @author['bibliography'].each do |year| %>
     <li>
-        <%= year %>
+        <ul>
+            <%= year[0] %>
+            <% year[1].each do |element| %>
+                <li>
+                    <%= element['title'] %>
+                    <% if element['ee'].is_a?(Hash) && element['ee']['__content__'] %>
+                        <a href="<%= element['ee']['__content__'] %>">Document Link</a>
+                    <% end %>
+
+                    <% if element['author'] %>
+                    <br>
+                    Authors:
+                    <ul>
+                        <% element['author'].each do |author| %>
+                            <li>
+                                <%= author['__content__'] %>
+                            </li>
+                        <% end %>
+                    </ul>
+                    <% end %>
+                </li>
+                <br>
+            <% end %>
+        </ul>
     </li>
   <% end %>
 </ul>

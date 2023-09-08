@@ -21,6 +21,18 @@ class AuthorsController < ApplicationController
       if !@author['bibliography'].key?(element['year'])
         @author['bibliography'][element['year']] = []
       end
+
+      if element['author']
+        element['author'].collect{ |author|
+          if author.is_a?(Array)
+            if author[0] == '__content__'
+              element['author'] = [{'__content__' => author[1]}]
+            end
+            puts element['author']
+          end
+        }
+      end
+      
       @author['bibliography'][element['year']].push(element)
     end
   end
