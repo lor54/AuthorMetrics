@@ -134,7 +134,6 @@ GEM
     nokogiri (1.15.4)
       mini_portile2 (~> 2.8.2)
       racc (~> 1.4)
-    ox (2.14.17)
     psych (5.1.0)
       stringio
     public_suffix (5.0.3)
@@ -231,7 +230,6 @@ DEPENDENCIES
   httparty
   importmap-rails
   jbuilder
-  ox
   puma (~> 5.0)
   rails (~> 7.0.7, >= 7.0.7.2)
   selenium-webdriver
