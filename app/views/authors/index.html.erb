@@ -1,16 +1,16 @@
 <h1>Authors</h1>
 <%# Search Bar %>
-<%= form_tag "/authors", method: "GET" do %>
-  <%= label_tag :search_by_name %>
-  <%= text_field_tag :search_by_name, params[:search_by_name] %>
+<%= form_tag authors_path, method: "GET" do %>
+  <%= label_tag :name %>
+  <%= text_field_tag :name, params[:name] %>
   <%= submit_tag "Search" %>
 <% end %>
 
 <%# Result List %>
 <ul>
-  <%= @authors.each do |author| %>
+  <% @authors.each do |author| %>
     <li>
-      <a href="/authors/<%= getUrlEncodedPid(author['info']['url']) %>"><%= author['info']['author'] %></a>
+      <a href="/authors/<%= getUrlEncodedPid(author['info']['url']) %>"><%= author['info']['author'].html_safe %></a>
     </li>
   <% end %>
 </ul>
@@ -18,10 +18,24 @@
 <%# Paginator %>
 <% if @pages > 0 %>
   <div class="pagination">
-    <a href="#">&laquo;</a>
-    <% for i in @beginPages..@maxPages do %>
-      <a class="active" href="#"><%= i %></a>
+    <% if @page > 1 %>
+      <%= link_to "&laquo;".html_safe, authors_path(name: params[:name], page: @page-1) %>
+    <% else %>
+      <a class="active">&laquo;</a>
     <% end %>
-    <a href="#">&raquo;</a>
+
+    <% for i in @beginPages..@endPages do %>
+      <% if i == @page %>
+        <a class="active"><%= i %></a>
+      <% else %>
+        <%= link_to i.to_s, authors_path(name: params[:name], page: i) %>
+      <% end %>
+    <% end %>
+
+    <% if @page < @pages %>
+      <%= link_to "&raquo;".html_safe, authors_path(name: params[:name], page: @page+1) %>
+    <% else %>
+      <a class="active">&raquo;</a>
+    <% end %>
   </div>
 <% end %>

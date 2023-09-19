@@ -1,5 +1,7 @@
 <h1>Autore: </h1>
 <%= @author['name'] %>
+<h3> ORCID: </h3>
+<%= @author['orcid'] %> - <%= @author['orcidStatus'] %>
 
 <h2>Bibliografia: </h2>
 <ul>
@@ -11,7 +13,9 @@
                 <li>
                     <%= element['title'] %>
                     <% if element['ee'].is_a?(Hash) && element['ee']['__content__'] %>
-                        <a href="<%= element['ee']['__content__'] %>">Document Link</a>
+                        <a target="_blank" href="<%= element['ee']['__content__'] %>">Document Link</a>
+                    <% elsif element['ee'].is_a?(String) %>
+                        <a target="_blank" href="<%= element['ee'] %>">Document Link</a>
                     <% end %>
 
                     <% if element['author'] %>
