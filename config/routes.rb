@@ -6,4 +6,6 @@ Rails.application.routes.draw do
   root "home#index"
   get "/authors", to: "authors#index"
   get "/authors/:id", to: "authors#show"
+  get "/authors/:id/:tab", to: "authors#show"
+
 end
