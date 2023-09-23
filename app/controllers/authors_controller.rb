@@ -37,8 +37,14 @@ class AuthorsController < ApplicationController
   end
   
   def show
-    pid = params[:id] || 0
-    authorresponse = getAuthorBibliography(pid)
+    @pid = params[:id] || 0
+    @tab = params[:tab] || ''
+
+    if(@tab != '' && @tab != 'publications' && @tab != 'collaborations')
+      redirect_to helpers.authorPath(@pid, '')
+    end
+    
+    authorresponse = getAuthorBibliography(@pid)
 
     @author = {}
     @author['orcid'] = ''
@@ -60,7 +66,7 @@ class AuthorsController < ApplicationController
     end
 
     @author['name'] = authorresponse['dblpperson']['name']
-    @author['pid'] = pid
+    @author['pid'] = @pid
     bibliography = authorresponse['dblpperson']['r']
 
     @author['bibliography'] = {}
@@ -104,6 +110,14 @@ class AuthorsController < ApplicationController
     if @author['orcid'].include? "https://orcid.org/"
       @author['orcid'].slice! "https://orcid.org/"
     end
+  end
+
+  def tab1
+    @action_name = "tab1"
+  end
+
+  def tab2
+    @action_name = "tab2"
   end
 
   def getAuthorInformations(orcid)

@@ -1,7 +1,33 @@
-<h1>Autore: </h1>
+<h1> Autore: </h1>
 <%= @author['name'] %>
 <h3> ORCID: </h3>
 <%= @author['orcid'] %> - <%= @author['orcidStatus'] %>
+
+<hr class="solid">
+
+Grafici H-Index
+
+<hr class="solid">
+
+<ul class="nav nav-tabs">
+  <li class="<%= 'active' if @tab == '' %>"><%= link_to_if @tab != '', 'Pubblicazioni', authorPath(@pid, '') %></li>
+  <li class="<%= 'active' if @tab == 'collaborations' %>"><%= link_to_if @tab != 'collaborations', 'Collaborazioni', authorPath(@pid, 'collaborations') %></li>
+</ul>
+
+<div class="tab-content">
+    <% if !@tab.nil? && @tab != '' %>
+        <%= render @tab %>
+    <% end %>
+</div>
+
+<h2>Ricerca nella Bibliografia: </h2>
+
+<%# Search Bar %>
+<%= form_tag authors_path, method: "GET" do %>
+  <%= label_tag :name %>
+  <%= text_field_tag :name, params[:name] %>
+  <%= submit_tag "Search" %>
+<% end %>
 
 <h2>Bibliografia: </h2>
 <ul>
@@ -24,7 +50,11 @@
                     <ul>
                         <% element['author'].each do |author| %>
                             <li>
-                                <%= author['__content__'] %>
+                                <% if author['pid'].present? %>
+                                    <a href="<%= getUrlEncodedPid(author['pid']) %>"><%= author['__content__'] %></a>
+                                <% else %>
+                                    <%= author['__content__'] %>
+                                <% end %>
                             </li>
                         <% end %>
                     </ul>
