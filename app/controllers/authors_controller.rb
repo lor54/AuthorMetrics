@@ -43,6 +43,10 @@ class AuthorsController < ApplicationController
     if(@tab != '' && @tab != 'publications' && @tab != 'collaborations')
       redirect_to helpers.authorPath(@pid, '')
     end
+
+    if(@tab == '')
+      @tab = 'publications'
+    end
     
     authorresponse = getAuthorBibliography(@pid)
 
@@ -100,24 +104,76 @@ class AuthorsController < ApplicationController
                 end
               end
             end
-            #@author['orcid'] = element['author']['orcid']
           end
         end
         @author['bibliography'][element['year']].push(element)
       end
     end unless bibliography.nil?
+    
+    if @tab == 'collaborations'
+      loadColaborations()
+    end
 
     if @author['orcid'].include? "https://orcid.org/"
       @author['orcid'].slice! "https://orcid.org/"
     end
   end
 
-  def tab1
-    @action_name = "tab1"
-  end
+  def loadColaborations()
+    @collaborations = {}
+    @collaborations['number'] = {}
+    @collaborations['data'] = {}
+    @author['bibliography'].each do |year, authors|
+      @collaborations['data'][year] = {}
+      authors.each do |element|
+        if element['author']
+          element['author'].collect{ |author|
+            if author.is_a?(Array)
+              if author[0] == '__content__'
+                auth = [{'__content__' => author[1]}]
 
-  def tab2
-    @action_name = "tab2"
+                if author[2] == 'pid'
+                  auth[0]['pid'] = author[3]
+                end
+
+                element['author'] = auth
+              end
+            end
+
+            element['author'].each do |element|
+              content_key = element["__content__"]
+              pid_key = element["pid"]
+            
+              @collaborations['data'][year][content_key] ||= {}
+            
+              if @collaborations['data'][year][content_key].key?(pid_key)
+                @collaborations['data'][year][content_key][pid_key] += 1
+              else
+                @collaborations['data'][year][content_key][pid_key] = 1
+              end
+            end
+          }
+        end
+      end
+    end
+
+    total_sum = {}
+
+    @collaborations['data'].each do |year, year_data|
+      next if year == "number"
+    
+      year_data.each do |name, name_data|
+        name_data.each do |pid, count|
+          total_sum[name] ||= {}
+          total_sum[name][pid] ||= 0
+          total_sum[name][pid] += count
+        end
+      end
+    end
+
+    @collaborations["number"] = total_sum
+
+    puts @collaborations
   end
 
   def getAuthorInformations(orcid)

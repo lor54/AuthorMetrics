@@ -1,1 +1,44 @@
-prova 1
+<%# Search Bar %>
+<%= form_tag authors_path, method: "GET" do %>
+  <%= label_tag :name %>
+  <%= text_field_tag :name, params[:name] %>
+  <%= submit_tag "Search" %>
+<% end %>
+
+<h2>Bibliografia: </h2>
+<ul>
+<% @author['bibliography'].each do |year| %>
+    <li>
+        <ul>
+            <%= year[0] %>
+            <% year[1].each do |element| %>
+                <li>
+                    <%= element['title'] %>
+                    <% if element['ee'].is_a?(Hash) && element['ee']['__content__'] %>
+                        <a target="_blank" href="<%= element['ee']['__content__'] %>">Document Link</a>
+                    <% elsif element['ee'].is_a?(String) %>
+                        <a target="_blank" href="<%= element['ee'] %>">Document Link</a>
+                    <% end %>
+
+                    <% if element['author'] %>
+                    <br>
+                    Authors:
+                    <ul>
+                        <% element['author'].each do |author| %>
+                            <li>
+                                <% if author['pid'].present? %>
+                                    <a href="<%= getUrlEncodedPid(author['pid']) %>"><%= author['__content__'] %></a>
+                                <% else %>
+                                    <%= author['__content__'] %>
+                                <% end %>
+                            </li>
+                        <% end %>
+                    </ul>
+                    <% end %>
+                </li>
+                <br>
+            <% end %>
+        </ul>
+    </li>
+<% end %>
+</ul>
