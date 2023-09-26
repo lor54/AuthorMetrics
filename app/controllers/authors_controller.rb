@@ -74,6 +74,10 @@ class AuthorsController < ApplicationController
     bibliography = authorresponse['dblpperson']['r']
 
     @author['bibliography'] = {}
+    if bibliography.is_a?(Hash)
+      bibliography = [bibliography]
+    end
+
     bibliography.each do |element|
       if element.is_a?(Hash)
         elementType = element.keys[0]
@@ -88,19 +92,41 @@ class AuthorsController < ApplicationController
           element['author'].collect{ |author|
             if author.is_a?(Array)
               if author[0] == '__content__'
-                element['author'] = [{'__content__' => author[1]}]
+                auth = [{'__content__' => author[1]}]
+
+                if author[2] == 'pid'
+                  auth[0]['pid'] = author[3]
+                end
+
+                element['author'] = auth
               end
             end
           }
+        elsif element['editor']
+          element['editor'].collect{ |author|
+            if author.is_a?(Array)
+              if author[0] == '__content__'
+                auth = [{'__content__' => author[1]}]
 
-          if @author['orcid'].empty?
-            if element['author'].is_a?(Array)
-              element['author'].each do |pubAuthor|
-                if pubAuthor.is_a?(Hash)
-                  if pubAuthor['pid'].present? && pid == pubAuthor['pid'] && pubAuthor['orcid'].present? && pubAuthor['orcid'].is_a?(String)
-                    @author['orcid'] = pubAuthor['orcid']
-                    @author['orcidStatus'] = 'unverified' 
-                  end
+                if author[2] == 'pid'
+                  auth[0]['pid'] = author[3]
+                end
+
+                element['author'] = auth
+              end
+            else
+              element['author'] = element['editor']
+            end
+          }
+        end
+
+        if @author['orcid'].empty?
+          if element['author'].is_a?(Array)
+            element['author'].each do |pubAuthor|
+              if pubAuthor.is_a?(Hash)
+                if pubAuthor['pid'].present? && @pid == pubAuthor['pid'] && pubAuthor['orcid'].present? && pubAuthor['orcid'].is_a?(String)
+                  @author['orcid'] = pubAuthor['orcid']
+                  @author['orcidStatus'] = 'unverified' 
                 end
               end
             end
@@ -140,17 +166,17 @@ class AuthorsController < ApplicationController
               end
             end
 
-            element['author'].each do |element|
-              content_key = element["__content__"]
-              pid_key = element["pid"]
-            
-              @collaborations['data'][year][content_key] ||= {}
-            
-              if @collaborations['data'][year][content_key].key?(pid_key)
-                @collaborations['data'][year][content_key][pid_key] += 1
-              else
-                @collaborations['data'][year][content_key][pid_key] = 1
-              end
+            content_key = author["__content__"]
+            pid_key = author["pid"]
+          
+            next if content_key == @author['name'] && (pid_key == @author['pid'] || pid_key.nil?)
+
+            @collaborations['data'][year][content_key] ||= {}
+          
+            if @collaborations['data'][year][content_key].key?(pid_key)
+              @collaborations['data'][year][content_key][pid_key] += 1
+            else
+              @collaborations['data'][year][content_key][pid_key] = 1
             end
           }
         end
@@ -158,22 +184,28 @@ class AuthorsController < ApplicationController
     end
 
     total_sum = {}
-
+    #@collaborations['data'].each do |year, year_data|    
+    #  year_data.each do |name, name_data|
+    #    name_data.each do |pid, count|
+    #      total_sum[name] ||= {}
+    #      total_sum[name][pid] ||= 0
+    #      total_sum[name][pid] += count
+    #    end
+    #  end
+    #end
     @collaborations['data'].each do |year, year_data|
-      next if year == "number"
-    
       year_data.each do |name, name_data|
         name_data.each do |pid, count|
-          total_sum[name] ||= {}
-          total_sum[name][pid] ||= 0
-          total_sum[name][pid] += count
+          if total_sum.key?(year)
+            total_sum[year] += count
+          else
+            total_sum[year] = count
+          end          
         end
       end
     end
 
     @collaborations["number"] = total_sum
-
-    puts @collaborations
   end
 
   def getAuthorInformations(orcid)
