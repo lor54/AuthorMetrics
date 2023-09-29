@@ -21,7 +21,7 @@ class AuthorsController < ApplicationController
         if @pages <= 0
           @endPages = @page
         end
-        
+
         if params[:page].to_i <= @pages
           @page = params[:page].to_i
         else
@@ -31,11 +31,11 @@ class AuthorsController < ApplicationController
         @beginPages = @page - @maxResultPages + 1 >= 1 ? @page - @maxResultPages + 1 : 1
         @endPages = @beginPages == 1 ? 5 : @page
 
-        @authors = authorsresponse['result']['hits']['hit'] 
+        @authors = authorsresponse['result']['hits']['hit']
       end
     end
   end
-  
+
   def show
     @pid = params[:id] || 0
     @tab = params[:tab] || ''
@@ -47,7 +47,7 @@ class AuthorsController < ApplicationController
     if(@tab == '')
       @tab = 'publications'
     end
-    
+
     authorresponse = getAuthorBibliography(@pid)
 
     @author = {}
@@ -126,7 +126,7 @@ class AuthorsController < ApplicationController
               if pubAuthor.is_a?(Hash)
                 if pubAuthor['pid'].present? && @pid == pubAuthor['pid'] && pubAuthor['orcid'].present? && pubAuthor['orcid'].is_a?(String)
                   @author['orcid'] = pubAuthor['orcid']
-                  @author['orcidStatus'] = 'unverified' 
+                  @author['orcidStatus'] = 'unverified'
                 end
               end
             end
@@ -135,7 +135,7 @@ class AuthorsController < ApplicationController
         @author['bibliography'][element['year']].push(element)
       end
     end unless bibliography.nil?
-    
+
     if @tab == 'collaborations'
       loadColaborations()
     end
@@ -168,11 +168,11 @@ class AuthorsController < ApplicationController
 
             content_key = author["__content__"]
             pid_key = author["pid"]
-          
+
             next if content_key == @author['name'] && (pid_key == @author['pid'] || pid_key.nil?)
 
             @collaborations['data'][year][content_key] ||= {}
-          
+
             if @collaborations['data'][year][content_key].key?(pid_key)
               @collaborations['data'][year][content_key][pid_key] += 1
             else
@@ -184,7 +184,7 @@ class AuthorsController < ApplicationController
     end
 
     total_sum = {}
-    #@collaborations['data'].each do |year, year_data|    
+    #@collaborations['data'].each do |year, year_data|
     #  year_data.each do |name, name_data|
     #    name_data.each do |pid, count|
     #      total_sum[name] ||= {}
@@ -200,7 +200,7 @@ class AuthorsController < ApplicationController
             total_sum[year] += count
           else
             total_sum[year] = count
-          end          
+          end
         end
       end
     end
