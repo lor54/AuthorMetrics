@@ -172,11 +172,13 @@ class AuthorsController < ApplicationController
             next if content_key == @author['name'] && (pid_key == @author['pid'] || pid_key.nil?)
 
             @collaborations['data'][year][content_key] ||= {}
-          
-            if @collaborations['data'][year][content_key].key?(pid_key)
-              @collaborations['data'][year][content_key][pid_key] += 1
+            @collaborations['data'][year][content_key][pid_key] ||= {}
+            @collaborations['data'][year][content_key][pid_key]['pid'] ||= pid_key
+
+            if @collaborations['data'][year][content_key][pid_key].key?('count')
+              @collaborations['data'][year][content_key][pid_key]['count'] += 1
             else
-              @collaborations['data'][year][content_key][pid_key] = 1
+              @collaborations['data'][year][content_key][pid_key]['count'] = 1
             end
           }
         end
@@ -195,7 +197,8 @@ class AuthorsController < ApplicationController
     #end
     @collaborations['data'].each do |year, year_data|
       year_data.each do |name, name_data|
-        name_data.each do |pid, count|
+        name_data.each do |pid, data|
+          count = data['count']
           if total_sum.key?(year)
             total_sum[year] += count
           else
