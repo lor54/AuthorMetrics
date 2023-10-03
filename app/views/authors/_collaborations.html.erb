@@ -8,14 +8,14 @@
             <%= year[0] %>
             <br>
             <% year[1].each do |element| %>
-                <%= element[0] %>
                 <% if element[1].is_a?(Hash) %>
                     <%if element[1].keys.count > 1 %>
-                        <% element[1].each do |pid| %>
-                            <%= pid %>
+                        <% element[1].each do |data| %>
+                            <%= data['pid'] %>
                         <% end %>
                     <% else %>
-                        <%= element[1][element[1].keys[0]] %>
+                        <a href="/authors/<%= ERB::Util.url_encode(element[1][element[1].keys[0]]['pid']) %>"><%= element[0] %></a>
+                        <%= element[1][element[1].keys[0]]['count'] %>
                     <% end %>
                 <% end %>
                 <br>
