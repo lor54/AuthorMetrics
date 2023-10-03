@@ -213,7 +213,7 @@ class AuthorsController < ApplicationController
   end
 
   def getAuthorBibliography(pid)
-    authordblp = HTTParty.get('https://dblp.org/pid/' + pid + '.xml')
+    authordblp = HTTParty.get('https://dblp.org/pid/' + pid + '.xml')/
     authordblp.parsed_response
   end
 

@@ -28,13 +28,40 @@ class ConferencesController < ApplicationController
         end
         @beginPages = @page - @maxResultPages + 1 >= 1 ? @page - @maxResultPages + 1 : 1
         @endPages = @beginPages == 1 ? 5 : @page
-
-        @conferences = conferencesResponse['result']['hits']['hit']
+        #remove all the result that are not conferences and workshops
+        conferences = conferencesResponse['result']['hits']['hit']
+        conferences.each do |element|
+          if element['info']['type'] == 'Conference or Workshop'
+            @conferences.push(element)
+          end
+        end
       end
     end
   end
 
   def show
+    @confId = params[:id] || 0
+    conferencesResponse = getConferenceInformation(@confId)
+
+    @conference = {}
+    @conference['name'] = conferencesResponse['bht']['h1']
+    @conference['editions'] = Array.new
+    #Extrapolate all the editions of the conferences in an array
+    conferenceEditions = conferencesResponse['bht']['h2']
+    if conferenceEditions.present?
+      if conferenceEditions.is_a?(Array)
+        conferenceEditions.each do |edition|
+          @conference['editions'].push(edition)
+        end
+      elsif conferenceEditions.is_a?(String)
+        @conference['editions'].push(conferenceEditions)
+      end
+    end
+  end
+
+  def getConferenceInformation(confId)
+    conferenceDblp = HTTParty.get('https://dblp.org/db/conf/' + confId + '/index.xml')
+    conferenceDblp.parsed_response
   end
 
   def searchConference(name, maxPerPage, startValue)

@@ -10,7 +10,7 @@
 <ul>
   <% @conferences.each do |conference| %>
     <li>
-        <a href="/conferences/<%= getUrlEncodedPid(conference['info']['url']) %>"><%= conference['info']['venue']%>>
+        <a href="/conferences/<%= conference['info']['url'].delete_prefix('https://dblp.org/db/conf/') %>"><%= conference['info']['venue']%>
     </li>
   <% end %>
 </ul>
