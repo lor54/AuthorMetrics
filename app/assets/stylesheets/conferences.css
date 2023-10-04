@@ -1,0 +1,49 @@
+div.scroll {
+    margin: 4px, 4px;
+    padding: 4px;
+    width: 99%;
+    overflow-x: auto;
+    overflow-y: hidden;
+    white-space: nowrap;
+}
+div.page {
+    position: fixed;
+    padding: 0;
+    margin: 0;
+
+    top: 0;
+    left: 0;
+
+    width: 99%;
+    height: 100%;
+    background-color: #8488b5;
+}
+
+div.editorship{
+    position: relative;
+    padding: 4px;
+    margin: 2px;
+
+    left: 15%;
+    top: 15%;
+
+    width: 84%;
+    height: 84%;
+    background-color: #bcb9d8;
+}
+
+div.editor_elem{
+    position: relative;
+    padding: 1px;
+    margin: 3px;
+    border: 2px;
+
+    width: 100%;
+    height: 20%;
+    background-color: #DEDEEA ;
+}
+
+ul{
+    list-style-type: none;
+    padding-left: 0px;
+}

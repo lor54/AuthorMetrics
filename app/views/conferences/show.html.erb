@@ -1,5 +1,8 @@
-<ul>
-    <% @conference['editions'].each do |edition| %>
-        <li><%=edition %></li>
-    <% end %>
-</ul>
+<div class="page">
+    <div class="scroll">
+        <% @conference['editions'].each do |edition| %>
+            <div><%= link_to edition[0]%></div>
+        <% end %>
+    </div>
+
+</div>

@@ -172,17 +172,11 @@ class AuthorsController < ApplicationController
             next if content_key == @author['name'] && (pid_key == @author['pid'] || pid_key.nil?)
 
             @collaborations['data'][year][content_key] ||= {}
-<<<<<<< HEAD
-
-            if @collaborations['data'][year][content_key].key?(pid_key)
-              @collaborations['data'][year][content_key][pid_key] += 1
-=======
             @collaborations['data'][year][content_key][pid_key] ||= {}
             @collaborations['data'][year][content_key][pid_key]['pid'] ||= pid_key
 
             if @collaborations['data'][year][content_key][pid_key].key?('count')
               @collaborations['data'][year][content_key][pid_key]['count'] += 1
->>>>>>> de70e62af3584e3099f0b56248b9191be435ba0d
             else
               @collaborations['data'][year][content_key][pid_key]['count'] = 1
             end
@@ -222,7 +216,7 @@ class AuthorsController < ApplicationController
   end
 
   def getAuthorBibliography(pid)
-    authordblp = HTTParty.get('https://dblp.org/pid/' + pid + '.xml')/
+    authordblp = HTTParty.get('https://dblp.org/pid/' + pid + '.xml')
     authordblp.parsed_response
   end
 

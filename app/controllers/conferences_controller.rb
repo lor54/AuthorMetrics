@@ -46,15 +46,16 @@ class ConferencesController < ApplicationController
     @conference = {}
     @conference['name'] = conferencesResponse['bht']['h1']
     @conference['editions'] = Array.new
+    @conference['']
     #Extrapolate all the editions of the conferences in an array
     conferenceEditions = conferencesResponse['bht']['h2']
     if conferenceEditions.present?
       if conferenceEditions.is_a?(Array)
         conferenceEditions.each do |edition|
-          @conference['editions'].push(edition)
+          @conference['editions'].push(edition.split(':'))
         end
       elsif conferenceEditions.is_a?(String)
-        @conference['editions'].push(conferenceEditions)
+        @conference['editions'].push(conferenceEditions.split(':'))
       end
     end
   end
