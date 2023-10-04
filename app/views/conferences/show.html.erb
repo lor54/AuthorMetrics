@@ -1,8 +1,17 @@
-<div class="page">
-    <div class="scroll">
-        <% @conference['editions'].each do |edition| %>
-            <div><%= link_to edition[0]%></div>
+<div>
+<h1><%= @conference['name']%></h1>
+    <div>
+        <%= turbo_frame_tag "edition_list" do %>
+            <% @conference['editions'].keys.each do |edition| %>
+                <div>
+                    <%= link_to edition,
+                                url_for(:edition => edition),
+                                data:{ turbo_frame: "edition_info"}%>
+                </div>
+            <% end %>
         <% end %>
     </div>
-
+    <%= turbo_frame_tag "edition_info" do %>
+        <%= render "edition"%>
+    <% end %>
 </div>

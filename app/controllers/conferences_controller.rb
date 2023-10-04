@@ -45,24 +45,35 @@ class ConferencesController < ApplicationController
 
     @conference = {}
     @conference['name'] = conferencesResponse['bht']['h1']
-    @conference['editions'] = Array.new
-    @conference['']
+    @conference['editions'] = Hash.new
     #Extrapolate all the editions of the conferences in an array
     conferenceEditions = conferencesResponse['bht']['h2']
     if conferenceEditions.present?
       if conferenceEditions.is_a?(Array)
         conferenceEditions.each do |edition|
-          @conference['editions'].push(edition.split(':'))
+          edition_name = edition.split(':')[0]
+          editionUrls = conferencesResponse['bht']['dblpcites']
         end
       elsif conferenceEditions.is_a?(String)
-        @conference['editions'].push(conferenceEditions.split(':'))
+        edition_name = conferenceEditions.split(':')[0]
+        @conference['editions'][edition_name] = 0
       end
     end
+  end
+
+  def editionConstructor(editions,confId)
+    editionResponse = getEditionInformation(editionId,confId)
+    editionsList = editionResponse['dblpcites']
   end
 
   def getConferenceInformation(confId)
     conferenceDblp = HTTParty.get('https://dblp.org/db/conf/' + confId + '/index.xml')
     conferenceDblp.parsed_response
+  end
+
+  def getEditionInformation(editionId,confId)
+    editionDblp = HTTParty.get('https://dblp.org/db/conf/conf/' + confId + '/' + editionId + '/index.xml')
+    editionDblp.parsed_response
   end
 
   def searchConference(name, maxPerPage, startValue)

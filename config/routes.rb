@@ -2,8 +2,8 @@ Rails.application.routes.draw do
   get 'users/show'
   devise_for :users
 
-  devise_scope :user do  
-    get '/users/sign_out' => 'devise/sessions#destroy'     
+  devise_scope :user do
+    get '/users/sign_out' => 'devise/sessions#destroy'
   end
   # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
 
@@ -11,6 +11,7 @@ Rails.application.routes.draw do
   root "home#index"
   get '/conferences', to: "conferences#index"
   get '/conferences/:id', to: "conferences#show"
+  get '/conferences/:id/:edition', to: "conferences#show"
   get "/authors", to: "authors#index"
   get "/authors/:id", to: "authors#show"
   get "/authors/:id/:tab", to: "authors#show"
