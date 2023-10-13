@@ -4,6 +4,18 @@
   <%= render "users/shared/error_messages", resource: resource %>
 
   <div class="field">
+    <%= image_tag(resource.avatar_thumbnail) if resource.avatar.attached? %>
+  </div>
+
+  <div class="filed">
+    <% if resource.avatar.attached? %>
+      <%= image_tag(resource.avatar) %>
+    <% else %>
+      <%= image_tag("/default_profile.jpg") %>
+    <% end %>
+  </div>
+
+  <div class="field">
     <%= f.label :email %><br />
     <%= f.email_field :email, autofocus: true, autocomplete: "email" %>
   </div>

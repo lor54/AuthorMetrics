@@ -1,7 +1,23 @@
 <h1>Benvenuti</h1>
 
 <% if user_signed_in? %>
-    Logged in as <%=current_user.email%> <%= link_to 'Logout', destroy_user_session_path, :method => :delete %> <%= link_to 'Pagina utente', users_show_path %>
+    <p>
+        Logged in as <%=current_user.email%> 
+    </p>
+    <p>
+        <%= link_to 'Logout', destroy_user_session_path, :method => :delete %>
+    </p>
+    <p>
+        <%= link_to 'Pagina utente', users_show_path %>
+    </p>
+    <p>
+        <%= link_to 'Modifica account', edit_user_registration_path %>
+    </p>
 <% else %>
-    <%= link_to 'Login', new_user_session_path %>
+    <p>
+        <%= link_to 'Sign in', new_user_session_path %>
+    </p>
+    <p>
+    <%= link_to 'Sign up', new_user_registration_path %>
+    </p>
 <% end %>
