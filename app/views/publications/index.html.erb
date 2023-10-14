@@ -1,7 +1,54 @@
-<%= @publication %>
+<%#= @publication %>
+<br>
+Name: <%= @publication['name'] %>
+<br>
+URL:
+<% if @publication['data']['ee'].is_a? (Hash) %>
+    <% if @publication['data']['ee'].has_key? ('__content__') %>
+        <%= @publication['data']['ee']['__content__'] %>
+    <% end %>
+<% end %>
 <br>
 Type: <%= @publication['type'] %>
 <br>
 DOI: <%= @publication['doi'] %>
 <br>
-<%= @publication['references'] %>
+Referenze:
+<ul>
+<% if @publication['references'].length() > 0 %>
+    <% @publication['references'].each do |year, references| %>
+        <li>
+            Anno: <%= year %>
+            <ul>
+                <% references.each do |reference| %>
+                    <li>
+                        <%= reference['title'] %>
+                    </li>
+                <% end %>
+            </ul>
+        </li>
+    <% end %>
+<% else %>
+    No data
+<% end %>
+</ul>
+<br>
+Citazioni:
+<ul>
+<% if @publication['citations'].length() > 0 %>
+    <% @publication['citations'].each do |year, citations| %>
+        <li>
+            Anno: <%= year %>
+            <ul>
+                <% citations.each do |citation| %>
+                    <li>
+                        <%= citation['title'] %>
+                    </li>
+                <% end %>
+            </ul>
+        </li>
+    <% end %>
+<% else %>
+    No data
+<% end %>
+</ul>
