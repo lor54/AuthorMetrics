@@ -1,42 +1,12 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Profilo Utente</title>
-    <style>
-        /* Stili CSS per la disposizione in linea */
-        body {
-            display: flex;
-            align-items: center;
-        }
 
-        #profile-info {
-            display: flex;
-            align-items: center;
-        }
 
-        #profile-image {
-            margin-right: 20px; /* Spazio tra l'immagine e le informazioni */
-            max-width: 150px; /* Larghezza massima dell'immagine del profilo */
-        }
+<h1>Profilo Utente</h1>
+    <%= image_tag(current_user.avatar_thumbnail) %>
+    <ul>
+        <li><strong>Email:</strong> <%= current_user.email %></li>
+        <li><strong>Nome:</strong> <%= current_user.name %></li>
+        <li><strong>Cognome:</strong> <%= current_user.surname %></li>
+        <li><strong>Username:</strong> <%= current_user.username %></li>
+    </ul>
 
-        ul {
-            list-style: none;
-        }
-    </style>
-</head>
-<body>
-    <h1>Profilo Utente</h1> <br/>
-    <div id="profile-info">
-        <img id="profile-image" src="<%= current_user.avatar_thumbnail %>" alt="Immagine del profilo">
-        <ul>
-            <li><strong>Email:</strong> <%= current_user.email %></li>
-            <li><strong>Nome:</strong> <%= current_user.name %></li>
-            <li><strong>Cognome:</strong> <%= current_user.surname %></li>
-            <li><strong>Username:</strong> <%= current_user.username %></li>
-        </ul>
-    </div>
-</body>
-</html>
 
