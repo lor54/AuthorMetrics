@@ -1,11 +1,27 @@
 <h1> Autore: </h1>
 <%= @author['name'] %>
+<br>
+<%= @author['last_known_institution'] %> - <%= @author['last_known_institution_type'] %> - <%= @author['last_known_institution_countrycode'] %>
 <h3> ORCID: </h3>
 <%= @author['orcid'] %> - <%= @author['orcidStatus'] %>
+<h3> # Pubblicazioni: </h3>
+<%= @author['works_count'] %>
+<h3> # Citazioni: </h3>
+<%= @author['citationNumber'] %>
+<h3> H-Index: </h3>
+<%= @author['h_index'] %>
 
 <hr class="solid">
 
-Grafici H-Index
+<% if @author['works_by_year'].keys.length > 0 %>
+    <h3> Numero di lavori per anno: </h3>
+    <%= column_chart @author['works_by_year'] %>
+<% end %>
+
+<% if @author['citations_counts_by_year'].keys.length > 0 %>
+    <h3> Numero di citazioni per anno: </h3>
+    <%= column_chart @author['citations_counts_by_year'] %>
+<% end %>
 
 <hr class="solid">
 

@@ -1,6 +1,6 @@
 <%#= @publication %>
 <br>
-Name: <%= @publication['name'] %>
+Name: <%= @publication['data']['title'] %>
 <br>
 URL:
 <% if @publication['data']['ee'].is_a? (Hash) %>

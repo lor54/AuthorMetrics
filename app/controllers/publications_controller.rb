@@ -6,7 +6,6 @@ class PublicationsController < ApplicationController
         publicationData = getPublicationInformation(key)
         publicationData = publicationData['dblp']
 
-        puts publicationData
 
         @publication = {}
         @publication['doi'] = ""
@@ -16,7 +15,7 @@ class PublicationsController < ApplicationController
         if publicationData.is_a?(Hash)
             @publication['type'] = publicationData.keys[0]
             @publication['data'] = publicationData[@publication['type']]
-            
+
             if @publication['data']['ee'].is_a? (Hash)
                 if @publication['data']['ee']['__content__'].include? "https://doi.org/"
                     doi = @publication['data']['ee']['__content__']

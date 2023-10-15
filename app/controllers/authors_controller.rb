@@ -143,6 +143,18 @@ class AuthorsController < ApplicationController
     if @author['orcid'].include? "https://orcid.org/"
       @author['orcid'].slice! "https://orcid.org/"
     end
+
+    if @author['orcid'] != ''
+      getExtraInformation()
+    else
+      @author['citationNumber'] = 'unavailable'
+      @author['works_count'] = 'unavailable'
+      @author['h_index'] = 'unavailable'
+      @author['last_known_institution'] = 'unavailable'
+      @author['last_known_institution_type'] = 'unavailable'
+      @author['last_known_institution_countrycode'] = 'unavailable'
+      @author['counts_by_year'] = {}
+    end
   end
 
   def loadColaborations()
@@ -209,6 +221,40 @@ class AuthorsController < ApplicationController
     end
 
     @collaborations["number"] = total_sum
+  end
+
+  def getExtraInformation()
+    extraInformation = HTTParty.get('https://api.openalex.org/authors/https://orcid.org/' + @author['orcid'])
+      extraInformation = extraInformation.parsed_response
+
+      @author['citationNumber'] = extraInformation['cited_by_count']
+      @author['h_index'] = extraInformation['summary_stats']['h_index']
+      @author['last_known_institution'] = extraInformation['last_known_institution']['display_name']
+      @author['last_known_institution_type'] = extraInformation['last_known_institution']['type']
+      @author['last_known_institution_countrycode'] = extraInformation['last_known_institution']['country_code']
+      citations_counts_by_year = {}
+
+      extraInformation['counts_by_year'].each do |yearData|
+        year = yearData['year'].to_s
+        if !citations_counts_by_year.has_key? (year)
+          citations_counts_by_year[year] = 0
+        end
+
+        citations_counts_by_year[year] += yearData['cited_by_count']
+      end
+      @author['citations_counts_by_year'] = citations_counts_by_year
+
+      @author['works_count'] = 0
+      works_counts_by_year = {}      
+      @author['bibliography'].each do |year, array|
+        if !works_counts_by_year.has_key? (year)
+          works_counts_by_year[year] = 0
+        end
+
+        works_counts_by_year[year] += array.length
+        @author['works_count'] += works_counts_by_year[year]
+      end
+      @author['works_by_year'] = works_counts_by_year 
   end
 
   def getAuthorInformations(orcid)
