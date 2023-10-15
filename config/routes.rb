@@ -2,7 +2,8 @@ Rails.application.routes.draw do
   get 'users/show'
   devise_for :users, controllers: {
     sessions: 'users/sessions',
-    registration: 'users/registrations'
+    registration: 'users/registrations',
+    omniauth_callbacks: 'users/omniauth_callbacks'
   }
 
   devise_scope :user do  
