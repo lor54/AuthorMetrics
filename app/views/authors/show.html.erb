@@ -9,7 +9,10 @@
 <h3> # Citazioni: </h3>
 <%= @author['citationNumber'] %>
 <h3> H-Index: </h3>
-<%= @author['h_index'] %>
+<%= @author['h_index'] %><br>
+<% if user_signed_in? %>
+    <%= button_to 'Follow',user_follows_path(current_user), method: :post %>
+<% end %>
 
 <hr class="solid">
 
