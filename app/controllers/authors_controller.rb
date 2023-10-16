@@ -53,6 +53,8 @@ class AuthorsController < ApplicationController
     @author = {}
     @author['orcid'] = ''
     @author['orcidStatus'] = 'none'
+    @author['bibliography_types'] = {}
+    @author['bibliography_types_peryear'] = []
     urls = authorresponse['dblpperson']['person']['url']
     if urls.present?
       if urls.is_a?(Array)
@@ -132,6 +134,41 @@ class AuthorsController < ApplicationController
             end
           end
         end
+
+        if !@author['bibliography_types'].has_key? (element['type'])
+          @author['bibliography_types'][element['type']] = 1
+        else
+          @author['bibliography_types'][element['type']] += 1
+        end
+
+        if @author['bibliography_types_peryear'].length > 0
+          found = false
+          @author['bibliography_types_peryear'].map { |type|
+            if type[:name] == element['type']
+              found = true
+              if !type[:data].has_key? (element['year'])
+                type[:data][element['year']] = 1
+              else
+                type[:data][element['year']] += 1
+              end
+            end
+          }
+          
+          if !found
+            newtype = {}
+            newtype[:name] = element['type']
+            newtype[:data] = {}
+            newtype[:data][element['year']] = 1
+            @author['bibliography_types_peryear'].append(newtype)
+          end
+        else
+          newtype = {}
+          newtype[:name] = element['type']
+          newtype[:data] = {}
+          newtype[:data][element['year']] = 1
+          @author['bibliography_types_peryear'].append(newtype)
+        end
+
         @author['bibliography'][element['year']].push(element)
       end
     end unless bibliography.nil?
@@ -144,9 +181,7 @@ class AuthorsController < ApplicationController
       @author['orcid'].slice! "https://orcid.org/"
     end
 
-    if @author['orcid'] != ''
-      getExtraInformation()
-    else
+    if @author['orcid'] == ''
       @author['citationNumber'] = 'unavailable'
       @author['works_count'] = 'unavailable'
       @author['h_index'] = 'unavailable'
@@ -154,7 +189,12 @@ class AuthorsController < ApplicationController
       @author['last_known_institution_type'] = 'unavailable'
       @author['last_known_institution_countrycode'] = 'unavailable'
       @author['counts_by_year'] = {}
+      @author['works_by_year'] = {}
+      @author['citations_counts_by_year'] = {}
     end
+    getExtraInformation()
+    fixBibliographyTypesPerYear()
+    puts @author['bibliography_types_peryear']
   end
 
   def loadColaborations()
@@ -198,15 +238,6 @@ class AuthorsController < ApplicationController
     end
 
     total_sum = {}
-    #@collaborations['data'].each do |year, year_data|
-    #  year_data.each do |name, name_data|
-    #    name_data.each do |pid, count|
-    #      total_sum[name] ||= {}
-    #      total_sum[name][pid] ||= 0
-    #      total_sum[name][pid] += count
-    #    end
-    #  end
-    #end
     @collaborations['data'].each do |year, year_data|
       year_data.each do |name, name_data|
         name_data.each do |pid, data|
@@ -224,7 +255,8 @@ class AuthorsController < ApplicationController
   end
 
   def getExtraInformation()
-    extraInformation = HTTParty.get('https://api.openalex.org/authors/https://orcid.org/' + @author['orcid'])
+    if @author['orcid'] != ''
+      extraInformation = HTTParty.get('https://api.openalex.org/authors/https://orcid.org/' + @author['orcid'])
       extraInformation = extraInformation.parsed_response
 
       @author['citationNumber'] = extraInformation['cited_by_count']
@@ -243,18 +275,34 @@ class AuthorsController < ApplicationController
         citations_counts_by_year[year] += yearData['cited_by_count']
       end
       @author['citations_counts_by_year'] = citations_counts_by_year
+    end
 
-      @author['works_count'] = 0
-      works_counts_by_year = {}      
-      @author['bibliography'].each do |year, array|
-        if !works_counts_by_year.has_key? (year)
-          works_counts_by_year[year] = 0
-        end
-
-        works_counts_by_year[year] += array.length
-        @author['works_count'] += works_counts_by_year[year]
+    @author['works_count'] = 0
+    works_counts_by_year = {}      
+    @author['bibliography'].each do |year, array|
+      if !works_counts_by_year.has_key? (year)
+        works_counts_by_year[year] = 0
       end
-      @author['works_by_year'] = works_counts_by_year 
+
+      works_counts_by_year[year] += array.length
+      @author['works_count'] += works_counts_by_year[year]
+    end
+
+    @author['works_by_year'] = works_counts_by_year 
+    @author['works_source'] = {}
+    if @author['works_count'] > 0
+      @author['works_source']['dblp'] = @author['works_count']
+    end
+  end
+
+  def fixBibliographyTypesPerYear()
+    @author['works_by_year'].each do |year, value|
+      @author['bibliography_types_peryear'].map { |type|
+        if !type[:data].has_key? (year)
+          type[:data][year] = 0
+        end
+      }
+    end
   end
 
   def getAuthorInformations(orcid)

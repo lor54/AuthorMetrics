@@ -43,7 +43,20 @@
             </div>
         </div>
         <div class="col-xs-6">
+            <% if @author['bibliography_types'].keys.length > 0 %>
+                <h3> Pubblicazioni per tipologia per anno: </h3>
+                <%= pie_chart @author['bibliography_types'] %>
+            <% end %>
 
+            <% if @author['works_source'].keys.length > 0 %>
+                <h3> Pubblicazioni per tipologia per sorgente: </h3>
+                <%= pie_chart @author['works_source'] %>
+            <% end %>
+
+            <% if @author['bibliography_types_peryear'].length > 0 %>
+                <h3> Pubblicazioni per tipologia per sorgente: </h3>
+                <%= line_chart @author['bibliography_types_peryear'], zeros: true %>
+            <% end %>
         </div>
     </div>
 </div>
