@@ -1,0 +1,17 @@
+<div>
+    <h1><%= @conference['name']%></h1>
+    <%= turbo_frame_tag "first_turbo_frame" do %>
+        <div>
+            <% @conference['editions'].keys.each do |edition| %>
+                <div>
+                    <%= link_to edition,
+                        "./1",
+                        data: {turbo_frame: "edition_turbo_frame"}%>
+                </div>
+            <% end %>
+        </div>
+    <%end%>
+    <%= turbo_frame_tag "edition_turbo_frame" do %>
+        <div>Informazione edizioni </div>
+    <%end%>
+</div>
