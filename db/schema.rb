@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2023_10_02_180621) do
+ActiveRecord::Schema[7.0].define(version: 2023_10_17_133533) do
   create_table "authors", force: :cascade do |t|
     t.integer "authorid"
     t.string "name"
@@ -23,11 +23,19 @@ ActiveRecord::Schema[7.0].define(version: 2023_10_02_180621) do
   end
 
   create_table "conferences", force: :cascade do |t|
+    t.string "confId"
     t.string "name"
     t.string "acronym"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.string "ConfId"
+  end
+
+  create_table "editions", primary_key: ["editionId", "confId"], force: :cascade do |t|
+    t.string "name"
+    t.string "confId", null: false
+    t.integer "editionId", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
   end
 
   create_table "publications", force: :cascade do |t|
