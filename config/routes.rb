@@ -19,9 +19,9 @@ Rails.application.routes.draw do
 
   # Defines the root path route ("/")
   root "home#index"
-  get '/conferences', to: "conferences#index"
-  get '/conferences/:id', to: "conferences#show"
-  get '/conferences/:id/:edition', to: "editions#show"
+  resources :conferences, only: [:index, :show] do
+    resources :editions, only: [:show]
+  end
   get "/authors", to: "authors#index"
   get "/authors/:id", to: "authors#show"
   get "/authors/:id/:tab", to: "authors#show"

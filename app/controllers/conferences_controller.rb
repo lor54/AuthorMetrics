@@ -57,7 +57,7 @@ class ConferencesController < ApplicationController
       if conferenceEditions.present?
         if conferenceEditions.is_a?(Array)
           length = conferenceEditions.length()
-          for elem in 0..length-1 do
+          for elem in 0..length-1 do #Iterate all h2 and dblpcites elements to extrapolate the information for the editions
             edition_name = conferenceEditions[elem].split(':')[0]
             url_papers = []
             if editionsInformation[elem] != nil
@@ -75,10 +75,23 @@ class ConferencesController < ApplicationController
               end
             end
           end
-          @conference['editions'][edition_name]
         elsif conferenceEditions.is_a?(String)
           edition_name = conferenceEditions.split(':')[0]
-          @conference['editions'][edition_name] = 0
+          url_papers = []
+          if editionsInformation != nil
+            editionsInformation['r'].each do |r|
+              if r.is_a?(Hash)
+                url_papers.push(r['proceedings']['url'])
+              elsif r.is_a?(Array)
+                if r[0] == "proceedings"
+                  url_papers.push(r[1]['url'])
+                end
+              end
+              if url_papers.length != 0
+              @conference['editions'][edition_name] = url_papers
+              end
+            end
+          end
         end
       end
       #Conference.create(confId: @confId, name: conference[Name])
@@ -88,11 +101,6 @@ class ConferencesController < ApplicationController
   def getConferenceInformation(confId)
     conferenceDblp = HTTParty.get('https://dblp.org/db/conf/' + confId + '/index.xml')
     conferenceDblp.parsed_response
-  end
-
-  def getEditionInformation(editionId,confId)
-    editionDblp = HTTParty.get('https://dblp.org/db/conf/conf/' + confId + '/' + editionId + '/index.xml')
-    editionDblp.parsed_response
   end
 
   def searchConference(name, maxPerPage, startValue)
