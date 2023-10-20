@@ -1,11 +1,12 @@
 <div>
+    <a href="/">Home</a>
     <h1><%= @conference['name']%></h1>
     <%= turbo_frame_tag "first_turbo_frame" do %>
         <div>
             <% @conference['editions'].keys.each do |edition| %>
                 <div>
                     <%= link_to edition,
-                        "./1",
+                        conference_edition_path(conference_id: @confId, id: edition, urls:@conference['editions'][edition]),
                         data: {turbo_frame: "edition_turbo_frame"}%>
                 </div>
             <% end %>
@@ -14,4 +15,5 @@
     <%= turbo_frame_tag "edition_turbo_frame" do %>
         <div>Informazione edizioni </div>
     <%end%>
+
 </div>
