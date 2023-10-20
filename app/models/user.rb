@@ -1,5 +1,5 @@
 class User < ApplicationRecord
-  has_many :authors, foreign_key: 'author_id', class_name: 'Follow'
+  has_many :follows
   # Include default devise modules. Others available are:
   # :confirmable, :lockable, :timeoutable, :trackable and :omniauthable
   devise :database_authenticatable, :registerable,

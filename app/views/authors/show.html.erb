@@ -10,8 +10,14 @@
 <%= @author['citationNumber'] %>
 <h3> H-Index: </h3>
 <%= @author['h_index'] %><br>
+
 <% if user_signed_in? %>
-    <%= button_to 'Follow',user_follows_path(current_user), method: :post %>
+    <% follow = current_user.follows.find_by(author_id: @author['authorid']) %>
+    <% if follow.nil? %>
+        <%= button_to 'Follow', follows_path, params: { author_id: @author['authorid']}, method: :post %>
+    <% else %>
+        <%= button_to 'Unfollow', follow_path(follow), method: :delete %>
+    <% end %>
 <% end %>
 
 <hr class="solid">
