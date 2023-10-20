@@ -1,3 +1,5 @@
 class Follow < ApplicationRecord
-    belongs_to :user_id, class_name: 'User'
+  validates :user_id, uniqueness: { scope: :author_id } 
+  belongs_to :user
+  belongs_to :author
 end
