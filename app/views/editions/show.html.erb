@@ -13,8 +13,8 @@
     Authors:
     <div>
         <% @authors.each do |author|%>
-            <div>
-                <%= link_to author,"a" %>
+            <div data-turbo="false">
+                <a href="/authors/<%= getUrlEncodedPid(author[0]) %>"><%= author[1].html_safe %></a>
             </div>
         <%end%>
         <%= paginate @authors, param_name: :authorspage %>

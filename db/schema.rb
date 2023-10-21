@@ -10,11 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-<<<<<<< HEAD
 ActiveRecord::Schema[7.0].define(version: 2023_10_20_084925) do
-=======
-ActiveRecord::Schema[7.0].define(version: 2023_10_17_133533) do
->>>>>>> conference_pubblication
   create_table "active_storage_attachments", force: :cascade do |t|
     t.string "name", null: false
     t.string "record_type", null: false
@@ -62,25 +58,22 @@ ActiveRecord::Schema[7.0].define(version: 2023_10_17_133533) do
     t.datetime "updated_at", null: false
   end
 
-  create_table "follows", force: :cascade do |t|
-    t.integer "user_id", null: false
-    t.integer "author_id", null: false
   create_table "editions", primary_key: ["editionId", "confId"], force: :cascade do |t|
     t.string "name"
     t.string "confId", null: false
     t.integer "editionId", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.index ["author_id"], name: "index_follows_on_author_id"
-    t.index ["user_id", "author_id"], name: "index_follows_on_user_id_and_author_id", unique: true
-    t.index ["user_id"], name: "index_follows_on_user_id"
   end
 
   create_table "follows", force: :cascade do |t|
-    t.integer "user_id"
-    t.integer "author_id"
+    t.integer "user_id", null: false
+    t.integer "author_id", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.index ["author_id"], name: "index_follows_on_author_id"
+    t.index ["user_id", "author_id"], name: "index_follows_on_user_id_and_author_id", unique: true
+    t.index ["user_id"], name: "index_follows_on_user_id"
   end
 
   create_table "publications", force: :cascade do |t|

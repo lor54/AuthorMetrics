@@ -49,7 +49,6 @@ class AuthorsController < ApplicationController
     end
 
     authorresponse = getAuthorBibliography(@pid)
-
     @author = {}
     @author['orcid'] = ''
     @author['orcidStatus'] = 'none'
@@ -153,7 +152,7 @@ class AuthorsController < ApplicationController
               end
             end
           }
-          
+
           if !found
             newtype = {}
             newtype[:name] = element['type']
@@ -278,7 +277,7 @@ class AuthorsController < ApplicationController
     end
 
     @author['works_count'] = 0
-    works_counts_by_year = {}      
+    works_counts_by_year = {}
     @author['bibliography'].each do |year, array|
       if !works_counts_by_year.has_key? (year)
         works_counts_by_year[year] = 0
@@ -288,7 +287,7 @@ class AuthorsController < ApplicationController
       @author['works_count'] += works_counts_by_year[year]
     end
 
-    @author['works_by_year'] = works_counts_by_year 
+    @author['works_by_year'] = works_counts_by_year
     @author['works_source'] = {}
     if @author['works_count'] > 0
       @author['works_source']['dblp'] = @author['works_count']
