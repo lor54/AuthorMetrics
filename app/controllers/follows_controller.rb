@@ -1,24 +1,25 @@
 class FollowsController < ApplicationController
 
     def create
-        @follow = current_user.follows.new(follow_params)
+        code = params[:author_id]
+        id = code.delete('/').to_i
+        author = Author.find_by(authorid: id)
+        if author.nil?
+            author = Author.create(authorid: id, name: params[:name])
+        end
+        @follow = Follow.new(user: current_user, author: author)
         if !@follow.save
             flash[:notice] = @follow.errors.full_message.to_sentence
         end
-        redirect_to authors_path(name: params[:name])
+        redirect_to author_path(params[:author_id])
     end
 
     def destroy
         @follow = current_user.follows.find(params[:id])
         author = @follow.author
-        @like.destroy
-        redirect_to author
-    end
-
-    private
-
-    def follow_params
-        params.require(:follow).permit(:author_id)
+        @follow.destroy
+        id = author.authorid.to_s.insert(-5, '/')
+        redirect_to author_path(id)
     end
 
 end

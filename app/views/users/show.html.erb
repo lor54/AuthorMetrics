@@ -10,4 +10,15 @@
         <li><strong>Numero autori seguiti:</strong> <%= current_user.follows.count %></li>
     </ul>
 
-
+<% if current_user.follows.count > 0 %>
+<ul>
+    <% current_user.follows.each do |follow| %>
+        <% author = Author.find_by(id: follow.author_id) %>
+        <% id = author.authorid.to_s.insert(-5, '/') %>
+        <% name = author.name %>
+        <li>
+            <%= link_to name, author_path(id) %>
+        </li>
+    <% end %>
+</ul>
+<% end %>

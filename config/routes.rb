@@ -11,7 +11,7 @@ Rails.application.routes.draw do
 
   resources :users
 
-  resources :follows, only: [:create, :destroy]
+  resources :follows, only: [:destroy]
   # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
 
   # Defines the root path route ("/")
@@ -20,7 +20,9 @@ Rails.application.routes.draw do
     resources :editions, only: [:show]
   end
   get "/authors", to: "authors#index"
-  get "/authors/:id", to: "authors#show"
+  resources :authors, only: [:show] do
+    resources :follows, path: 'author_follows/:name' , only: [:create]
+  end
   get "/authors/:id/:tab", to: "authors#show"
   get "/publications/:key", to: "publications#index"
 
