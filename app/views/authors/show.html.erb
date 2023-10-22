@@ -13,8 +13,8 @@
 
 <% if user_signed_in? %>
     <% id = @author['pid'].delete('/').to_i %>
-    <% author = Author.find_by(authorid: id) %>
-    <% follow = current_user.follows.find_by(author: author) %>
+    <% author = Author.find_by(author_id: id) %>
+    <% follow = current_user.follows.find_by(author_id: author) %>
     <% if follow.nil? %>
         <%= button_to 'Follow', author_follows_path(@author['pid'], @author['name']), method: :post %>
     <% else %>

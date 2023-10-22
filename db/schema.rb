@@ -40,7 +40,7 @@ ActiveRecord::Schema[7.0].define(version: 2023_10_20_084925) do
   end
 
   create_table "authors", id: false, force: :cascade do |t|
-    t.integer "authorid", null: false
+    t.integer "author_id", null: false
     t.string "name"
     t.string "surname"
     t.float "hindex"
@@ -48,7 +48,7 @@ ActiveRecord::Schema[7.0].define(version: 2023_10_20_084925) do
     t.integer "citationsnumber"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.index ["authorid"], name: "index_authors_on_authorid", unique: true
+    t.index ["author_id"], name: "index_authors_on_author_id", unique: true
   end
 
   create_table "conferences", force: :cascade do |t|
@@ -69,7 +69,7 @@ ActiveRecord::Schema[7.0].define(version: 2023_10_20_084925) do
 
   create_table "follows", force: :cascade do |t|
     t.integer "user_id", null: false
-    t.integer "authorid", null: false
+    t.integer "author_id", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["user_id"], name: "index_follows_on_user_id"

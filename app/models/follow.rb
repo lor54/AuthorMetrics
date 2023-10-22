@@ -1,4 +1,4 @@
 class Follow < ApplicationRecord
   belongs_to :user
-  belongs_to :author, foreign_key: :authorid
+  belongs_to :author, foreign_key: :author_id
 end
