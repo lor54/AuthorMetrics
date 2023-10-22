@@ -1,3 +1,4 @@
 class Author < ApplicationRecord
-    has_many :follows, class_name: 'Follow', foreign_key: 'authorid'
+    self.primary_key = :authorid
+    has_many :follows
 end

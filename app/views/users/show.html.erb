@@ -13,7 +13,7 @@
 <% if current_user.follows.count > 0 %>
 <ul>
     <% current_user.follows.each do |follow| %>
-        <% author = Author.find_by(id: follow.author_id) %>
+        <% author = Author.find_by(authorid: follow.authorid) %>
         <% id = author.authorid.to_s.insert(-5, '/') %>
         <% name = author.name %>
         <li>
