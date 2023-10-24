@@ -8,10 +8,12 @@
 
 <%# Result List %>
 <ul>
-  <% @authors.each do |author| %>
-    <li>
-      <a href="/authors/<%= getUrlEncodedPid(author['info']['url']) %>"><%= author['info']['author'].html_safe %></a>
-    </li>
+  <% if @authors.is_a? (Array) %>
+    <% @authors.each do |author| %>
+      <li>
+        <a href="/authors/<%= getUrlEncodedPid(author['info']['url']) %>"><%= author['info']['author'].html_safe %></a>
+      </li>
+    <% end %>
   <% end %>
 </ul>
 

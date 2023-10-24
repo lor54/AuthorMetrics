@@ -37,8 +37,14 @@ class AuthorsController < ApplicationController
   end
 
   def show
+    @types = [ "all", "article", "inproceedings", "proceedings", "book", "incollection" ]
     @pid = params[:id] || 0
     @tab = params[:tab] || ''
+    title = params[:title] || ''
+    @type = params[:type] || 'all'
+    if !@types.include? (@type)
+      @type = 'all'
+    end
 
     if(@tab != '' && @tab != 'publications' && @tab != 'collaborations')
       redirect_to helpers.authorPath(@pid, '')
@@ -167,8 +173,12 @@ class AuthorsController < ApplicationController
           newtype[:data][element['year']] = 1
           @author['bibliography_types_peryear'].append(newtype)
         end
-
-        @author['bibliography'][element['year']].push(element)
+        
+        if @type == 'all' || @type == element['type'] # Research by type
+          if title == '' || element['title'].downcase.include?(title.downcase) # Research by title
+            @author['bibliography'][element['year']].push(element)
+          end
+        end
       end
     end unless bibliography.nil?
 
@@ -193,7 +203,6 @@ class AuthorsController < ApplicationController
     end
     getExtraInformation()
     fixBibliographyTypesPerYear()
-    puts @author['bibliography_types_peryear']
   end
 
   def loadColaborations()
@@ -250,7 +259,8 @@ class AuthorsController < ApplicationController
       end
     end
 
-    @collaborations["number"] = total_sum
+    @collaborations['number'] = total_sum
+    @collaborations['number'] = @collaborations['number'].sort.to_h
   end
 
   def getExtraInformation()
@@ -274,6 +284,7 @@ class AuthorsController < ApplicationController
         citations_counts_by_year[year] += yearData['cited_by_count']
       end
       @author['citations_counts_by_year'] = citations_counts_by_year
+      @author['citations_counts_by_year'] = @author['citations_counts_by_year'].sort.to_h
     end
 
     @author['works_count'] = 0
@@ -288,6 +299,7 @@ class AuthorsController < ApplicationController
     end
 
     @author['works_by_year'] = works_counts_by_year
+
     @author['works_source'] = {}
     if @author['works_count'] > 0
       @author['works_source']['dblp'] = @author['works_count']
@@ -302,6 +314,11 @@ class AuthorsController < ApplicationController
         end
       }
     end
+
+    @author['works_by_year'] = @author['works_by_year'].sort.to_h # Graph sort by year
+    @author['bibliography_types_peryear'].map { |type| # Graph sort by year
+      type[:data] = type[:data].sort.to_h
+    }
   end
 
   def getAuthorInformations(orcid)

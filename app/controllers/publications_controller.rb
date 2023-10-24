@@ -33,6 +33,13 @@ class PublicationsController < ApplicationController
                 @publication['references'] = getPublicationCitRef(doi)['references']
                 @publication['citations'] = getPublicationCitRef(doi)['citations']
             end
+
+            @publication['citationsNum_peryear'] = {}
+            @publication['citations'].each do |year, citations|
+                @publication['citationsNum_peryear'][year] = citations.length
+            end
+
+            @publication['citationsNum_peryear'] = @publication['citationsNum_peryear'].sort.to_h
         end
     end
 

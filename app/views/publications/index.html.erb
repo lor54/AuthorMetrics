@@ -13,25 +13,6 @@ Type: <%= @publication['type'] %>
 <br>
 DOI: <%= @publication['doi'] %>
 <br>
-Referenze:
-<ul>
-<% if @publication['references'].length() > 0 %>
-    <% @publication['references'].each do |year, references| %>
-        <li>
-            Anno: <%= year %>
-            <ul>
-                <% references.each do |reference| %>
-                    <li>
-                        <%= reference['title'] %>
-                    </li>
-                <% end %>
-            </ul>
-        </li>
-    <% end %>
-<% else %>
-    No data
-<% end %>
-</ul>
 <br>
 Citazioni:
 <ul>
@@ -52,3 +33,28 @@ Citazioni:
     No data
 <% end %>
 </ul>
+<br>
+Referenze:
+<ul>
+<% if @publication['references'].length() > 0 %>
+    <% @publication['references'].each do |year, references| %>
+        <li>
+            Anno: <%= year %>
+            <ul>
+                <% references.each do |reference| %>
+                    <li>
+                        <%= reference['title'] %>
+                    </li>
+                <% end %>
+            </ul>
+        </li>
+    <% end %>
+<% else %>
+    No data
+<% end %>
+</ul>
+
+<% if @publication['citations'].length() > 0 %>
+    <h3> Citazioni totali per anno: </h3>
+    <%= column_chart @publication['citationsNum_peryear'] %>
+<% end %>

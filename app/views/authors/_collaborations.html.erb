@@ -1,7 +1,5 @@
 <p>Collaborazioni</p>
 
-<%= column_chart @collaborations['number'] %>
-
 <ul>
     <% @collaborations['data'].each do |year| %>
         <li>
@@ -24,3 +22,19 @@
         <br>
     <% end %>
 </ul>
+
+<div class="container">
+    <div class="row">
+        <div class="col-xs-6">
+            <div class="tab-content">
+                
+            </div>
+        </div>
+        <div class="col-xs-6">
+            <% if @collaborations['number'].length > 0 %>
+                <h3> Collaborazioni con autori: </h3>
+                <%= column_chart @collaborations['number'] %>
+            <% end %>
+        </div>
+    </div>
+</div>

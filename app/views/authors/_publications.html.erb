@@ -1,9 +1,12 @@
 <p>Pubblicazioni</p>
 
 <%# Search Bar %>
-<%= form_tag authors_path, method: "GET" do %>
-  <%= label_tag :name %>
-  <%= text_field_tag :name, params[:name] %>
+<%= form_tag request.path, method: "GET" do %>
+  <%= label_tag :title %>
+  <%= text_field_tag :title, params[:title] %>
+
+  <%= label_tag :type %>
+  <%= select_tag :type, options_for_select(@types, @type) %> 
   <%= submit_tag "Search" %>
 <% end %>
 
@@ -51,3 +54,29 @@
     </li>
 <% end %>
 </ul>
+
+<div class="container">
+    <div class="row">
+        <div class="col-xs-6">
+            <div class="tab-content">
+                
+            </div>
+        </div>
+        <div class="col-xs-6">
+            <% if @author['bibliography_types'].keys.length > 0 %>
+                <h3> Pubblicazioni per tipologia: </h3>
+                <%= pie_chart @author['bibliography_types'] %>
+            <% end %>
+
+            <% if @author['works_source'].keys.length > 0 %>
+                <h3> Pubblicazioni per tipologia per sorgente: </h3>
+                <%= pie_chart @author['works_source'] %>
+            <% end %>
+
+            <% if @author['bibliography_types_peryear'].length > 0 %>
+                <h3> Pubblicazioni per tipologia per anno e per tipo: </h3>
+                <%= line_chart @author['bibliography_types_peryear'], zeros: true %>
+            <% end %>
+        </div>
+    </div>
+</div>
