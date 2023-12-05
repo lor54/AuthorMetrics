@@ -1,24 +1,17 @@
-
+<%= stylesheet_link_tag 'user_show', media: 'all' %>
 
 <h1>Profilo Utente</h1>
-    <%= image_tag(current_user.avatar_thumbnail) %>
+<div class="user-info">
+    <%= image_tag(current_user.avatar_thumbnail, class:'avatar') %>
     <ul>
         <li><strong>Email:</strong> <%= current_user.email %></li>
         <li><strong>Nome:</strong> <%= current_user.name %></li>
         <li><strong>Cognome:</strong> <%= current_user.surname %></li>
         <li><strong>Username:</strong> <%= current_user.username %></li>
-        <li><strong>Numero autori seguiti:</strong> <%= current_user.follows.count %></li>
-    </ul>
-
-<% if current_user.follows.count > 0 %>
-<ul>
-    <% current_user.follows.each do |follow| %>
-        <% author = Author.find_by(author_id: follow.author_id) %>
-        <% id = author.author_id.to_s.insert(-5, '/') %>
-        <% name = author.name %>
-        <li>
-            <%= link_to name, author_path(id) %>
+        <li><strong><%= link_to "Autori Seguiti:", author_followed_path, data: { turbo_frame: "followed_authors_frame" }, remote: true %></strong>
+            <%= current_user.follows.count %>
         </li>
-    <% end %>
-</ul>
-<% end %>
+    </ul>
+</div>
+
+<turbo-frame id="followed_authors_frame"></turbo-frame>

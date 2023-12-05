@@ -1,0 +1,15 @@
+
+<% if current_user.follows.count > 0 %>
+<ul class="author-list">
+    <% current_user.follows.each do |follow| %>
+        <% author = Author.find_by(author_id: follow.author_id) %>
+        <% id = author.author_id.to_s.insert(-5, '/') %>
+        <% name = author.name %>
+        <li>
+            <%= link_to name, author_path(id), class:'author-link' %>
+        </li>
+    <% end %>
+</ul>
+<% else %>
+    <p>Nessun autore seguito</p>
+<% end %>

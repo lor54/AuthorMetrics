@@ -10,6 +10,7 @@ Rails.application.routes.draw do
   end
 
   resources :users
+  get '/author_followed', to: 'users#author_followed', as: 'author_followed'
 
   resources :follows, only: [:destroy]
   # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
