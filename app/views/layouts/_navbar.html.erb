@@ -1,0 +1,32 @@
+<nav class="navbar navbar-expand bg-body-tertiary">
+    </div class="container-fluid">
+        <%= link_to 'AuthorMetrics', root_path, class: 'navbar-brand ms-3' %>
+
+        <div class="collapse navbar-collapse"></div>
+            <% if user_signed_in? %>
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                    <li class="navbar-text">
+                        Logged in as <%=current_user.email%>
+                    </li>
+                    <li class="nav-item">
+                        <%= link_to 'Logout', destroy_user_session_path, :method => :delete, class: 'nav-link active' %>
+                    </li>
+                    <li class="nav-item">
+                        <%= link_to 'Pagina utente', user_path(current_user.id), class: 'nav-link active' %>
+                    </li>
+                    <li class="nav-item">
+                        <%= link_to 'Modifica account', edit_user_registration_path, class: 'nav-link active' %>
+                    </li>
+                </ul>
+            <% else %>
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                    <li class="nav-item">
+                        <%= link_to 'Sign in', new_user_session_path, class: 'nav-link active' %>
+                    </li>
+                    <li class="nav-item">
+                        <%= link_to 'Sign up', new_user_registration_path, class: 'nav-link active' %>
+                    </li>
+                </ul>
+            <% end %>
+    </div>
+</nav>

@@ -1,12 +1,12 @@
 
 <% if current_user.follows.count > 0 %>
-<ul class="author-list">
+<ul class="d-flex">
     <% current_user.follows.each do |follow| %>
         <% author = Author.find_by(author_id: follow.author_id) %>
         <% id = author.author_id.to_s.insert(-5, '/') %>
         <% name = author.name %>
         <li>
-            <%= link_to name, author_path(id), class:'author-link' %>
+            <%= link_to name, author_path(id), class:'btn btn-outline-secondary me-2' %>
         </li>
     <% end %>
 </ul>

@@ -26,10 +26,12 @@ class User < ApplicationRecord
         user = User.create(name: data['name'],
             email: data['email'],
             password: Devise.friendly_token[0,20]
+            provider: access_token.provider,
+            uid: access_token.uid
           )
     end
     user
-end
+  end
 
   def self.new_with_session(params, session)
     super.tap do |user|

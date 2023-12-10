@@ -1,9 +1,8 @@
-<%= stylesheet_link_tag 'user_show', media: 'all' %>
 
-<h1>Profilo Utente</h1>
-<div class="user-info">
-    <%= image_tag(current_user.avatar_thumbnail, class:'avatar') %>
-    <ul>
+<h1 class="ms-3">Profilo Utente</h1>
+<div class="d-flex ms-3">
+    <%= image_tag(current_user.avatar_thumbnail, class:'me-4') %>
+    <ul class="m-2 fs-5">
         <li><strong>Email:</strong> <%= current_user.email %></li>
         <li><strong>Nome:</strong> <%= current_user.name %></li>
         <li><strong>Cognome:</strong> <%= current_user.surname %></li>
