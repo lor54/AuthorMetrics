@@ -1,3 +1,6 @@
+require 'open-uri'
+require 'tempfile'
+
 class User < ApplicationRecord
   has_many :follows, class_name: 'Follow', foreign_key: 'user'
   # Include default devise modules. Others available are:
@@ -20,15 +23,29 @@ class User < ApplicationRecord
   def self.from_omniauth(access_token)
     data = access_token.info
     user = User.where(email: data['email']).first
-
+  
     # Uncomment the section below if you want users to be created if they don't exist
     unless user
-        user = User.create(name: data['name'],
-            email: data['email'],
-            password: Devise.friendly_token[0,20]
-            provider: access_token.provider,
-            uid: access_token.uid
-          )
+      user = User.create(
+        name: data['name'],
+        email: data['email'],
+        password: Devise.friendly_token[0, 20],
+        provider: access_token.provider,
+        uid: access_token.uid
+      )
+  
+      # Scarica l'immagine dall'URL e la salva come file temporaneo
+      tempfile = Tempfile.new(['avatar', '.jpg'])
+      tempfile.binmode
+      tempfile.write URI.open(data['image']).read
+      tempfile.rewind
+  
+      # Aggiungi l'immagine dell'avatar all'allegato 'avatar'
+      user.avatar.attach(io: tempfile, filename: 'avatar.jpg')
+  
+      # Chiudi e rimuovi il file temporaneo
+      tempfile.close
+      tempfile.unlink
     end
     user
   end

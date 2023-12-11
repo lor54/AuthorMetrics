@@ -1,4 +1,5 @@
 Rails.application.routes.draw do
+  
   devise_for :users, controllers: {
     sessions: 'users/sessions',
     registration: 'users/registrations',
@@ -27,4 +28,6 @@ Rails.application.routes.draw do
   get "/authors/:id/:tab", to: "authors#show"
   get "/publications/:key", to: "publications#index"
 
+  get '/faq', to: 'faq#index'
+  get '/faq/:file_name', to: 'faq#show', as: :show_faq
 end

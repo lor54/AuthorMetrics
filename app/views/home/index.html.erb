@@ -1,4 +1,23 @@
-<h1>Benvenuti</h1>
+<h1>Welcome to AuthorMetrics</h1>
 
 <a href="./conferences">Conferences</a>
 <p><%= link_to 'Authors', authors_path %></p>
+<h3>Search Authors</h3>
+<div class="d-inline-flex p-2">
+    <% ('A'..'Z').each do |letter| %>
+        <% search_params = { name: letter, commit: 'Search' } %>
+        <%= link_to "./authors?#{search_params.to_query}", class: 'me-2' do %>
+            <%= letter %>
+        <% end %>
+    <% end %>
+</div>
+
+<h3>Search Conferences</h3>
+<div class="d-inline-flex p-2">
+    <% ('A'..'Z').each do |letter| %>
+        <% search_params = { name: letter, commit: 'Search' } %>
+        <%= link_to "./conferences?#{search_params.to_query}", class: 'me-2' do %>
+            <%= letter %>
+        <% end %>
+    <% end %>
+</div>
