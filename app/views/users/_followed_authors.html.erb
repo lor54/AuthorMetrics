@@ -1,15 +1,17 @@
 
 <% if current_user.follows.count > 0 %>
-<ul class="d-flex">
-    <% current_user.follows.each do |follow| %>
-        <% author = Author.find_by(author_id: follow.author_id) %>
-        <% id = author.author_id.to_s.insert(-5, '/') %>
-        <% name = author.name %>
-        <li>
-            <%= link_to name, author_path(id), class:'btn btn-outline-secondary me-2' %>
-        </li>
-    <% end %>
-</ul>
+    <ul class="d-flex mt-2">
+        <% current_user.follows.map { |follow| Author.find_by(author_id: follow.author_id) }.sort_by(&:name).each do |author| %>
+            <% id = author.author_id.to_s.insert(-5, '/') %>
+            <% name = author.name %>
+            <li>
+                <%= link_to name, author_path(id), class:'btn btn-outline-secondary me-2' %>
+            </li>
+        <% end %>
+    </ul>
+
 <% else %>
-    <p>Nessun autore seguito</p>
+    <div class="mt-2">
+        Nessun autore seguito: clicca <%= link_to 'qui', authors_path %> per cercare un autore
+    </div>
 <% end %>

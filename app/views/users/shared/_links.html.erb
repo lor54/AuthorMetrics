@@ -23,7 +23,7 @@
     <div class="btn-group">
       <%= button_to omniauth_authorize_path(resource_name, provider), method: :post, data: { turbo: false }, class: 'btn btn-outline-secondary me-2' do %>
         <%= image_tag('google_logo.png', width: '20', height: '20') %>
-        Sign in with <%= OmniAuth::Utils.camelize(provider) %>
+        Sign in with Google <%# <%= OmniAuth::Utils.camelize(provider) %>
       <% end %>
     </div>
   <% end %>
