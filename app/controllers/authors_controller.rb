@@ -54,155 +54,188 @@ class AuthorsController < ApplicationController
       @tab = 'publications'
     end
 
-    authorresponse = getAuthorBibliography(@pid)
-    @author = {}
-    @author['orcid'] = ''
-    @author['orcidStatus'] = 'none'
-    @author['bibliography_types'] = {}
-    @author['bibliography_types_peryear'] = []
-    urls = authorresponse['dblpperson']['person']['url']
-    if urls.present?
-      if urls.is_a?(Array)
-        authorresponse['dblpperson']['person']['url'].each do |url|
-          if url.include? 'orcid'
-            @author['orcid'] = url
-            @author['orcidStatus'] = 'verified'
-            break
-          end
-        end
-      elsif urls.is_a?(String)
-        @author['orcid'] = urls
-        @author['orcidStatus'] = 'verified'
+    if Author.exists?(author_id: @pid)
+      @author = Author.find_by(author_id: @pid).as_json
+
+      @author['counts_by_year'] = {}
+      @author['works_by_year'] = {}
+      @author['citations_counts_by_year'] = {}
+      @author['bibliography'] = {}
+      @author['bibliography_types'] = {}
+      @author['bibliography_types_peryear'] = []
+      @author['works_source'] = {}
+
+      works = Work.where(author_id: @pid)
+      works.each do |work|
+        @author['bibliography'][element['year']].push(Publication.find_by(publication_id: work.publication_id))
       end
-    end
-
-    @author['name'] = authorresponse['dblpperson']['name']
-    @author['pid'] = @pid
-    bibliography = authorresponse['dblpperson']['r']
-
-    @author['bibliography'] = {}
-    if bibliography.is_a?(Hash)
-      bibliography = [bibliography]
-    end
-
-    bibliography.each do |element|
-      if element.is_a?(Hash)
-        elementType = element.keys[0]
-        element = element[element.keys[0]]
-        element['type'] = elementType
-
-        if !@author['bibliography'].key?(element['year'])
-          @author['bibliography'][element['year']] = []
-        end
-
-        if element['author']
-          element['author'].collect{ |author|
-            if author.is_a?(Array)
-              if author[0] == '__content__'
-                auth = [{'__content__' => author[1]}]
-
-                if author[2] == 'pid'
-                  auth[0]['pid'] = author[3]
-                end
-
-                element['author'] = auth
-              end
+      
+      p "esiste"
+    else
+      authorresponse = getAuthorBibliography(@pid)
+      @author = {}
+      @author['orcid'] = ''
+      @author['orcidStatus'] = 'none'
+      @author['bibliography_types'] = {}
+      @author['bibliography_types_peryear'] = []
+      urls = authorresponse['dblpperson']['person']['url']
+      if urls.present?
+        if urls.is_a?(Array)
+          authorresponse['dblpperson']['person']['url'].each do |url|
+            if url.include? 'orcid'
+              @author['orcid'] = url
+              @author['orcidStatus'] = 'verified'
+              break
             end
-          }
-        elsif element['editor']
-          element['editor'].collect{ |author|
-            if author.is_a?(Array)
-              if author[0] == '__content__'
-                auth = [{'__content__' => author[1]}]
-
-                if author[2] == 'pid'
-                  auth[0]['pid'] = author[3]
-                end
-
-                element['author'] = auth
-              end
-            else
-              element['author'] = element['editor']
-            end
-          }
+          end
+        elsif urls.is_a?(String)
+          @author['orcid'] = urls
+          @author['orcidStatus'] = 'verified'
         end
+      end
 
-        if @author['orcid'].empty?
-          if element['author'].is_a?(Array)
-            element['author'].each do |pubAuthor|
-              if pubAuthor.is_a?(Hash)
-                if pubAuthor['pid'].present? && @pid == pubAuthor['pid'] && pubAuthor['orcid'].present? && pubAuthor['orcid'].is_a?(String)
-                  @author['orcid'] = pubAuthor['orcid']
-                  @author['orcidStatus'] = 'unverified'
+      @author['name'] = authorresponse['dblpperson']['name']
+      @author['pid'] = @pid
+      bibliography = authorresponse['dblpperson']['r']
+
+      @author['bibliography'] = {}
+      if bibliography.is_a?(Hash)
+        bibliography = [bibliography]
+      end
+
+      bibliography.each do |element|
+        if element.is_a?(Hash)
+          elementType = element.keys[0]
+          element = element[element.keys[0]]
+          element['type'] = elementType
+
+          if !@author['bibliography'].key?(element['year'])
+            @author['bibliography'][element['year']] = []
+          end
+
+          if element['author']
+            element['author'].collect{ |author|
+              if author.is_a?(Array)
+                if author[0] == '__content__'
+                  auth = [{'__content__' => author[1]}]
+
+                  if author[2] == 'pid'
+                    auth[0]['pid'] = author[3]
+                  end
+
+                  element['author'] = auth
+                end
+              end
+            }
+          elsif element['editor']
+            element['editor'].collect{ |author|
+              if author.is_a?(Array)
+                if author[0] == '__content__'
+                  auth = [{'__content__' => author[1]}]
+
+                  if author[2] == 'pid'
+                    auth[0]['pid'] = author[3]
+                  end
+
+                  element['author'] = auth
+                end
+              else
+                element['author'] = element['editor']
+              end
+            }
+          end
+
+          if @author['orcid'].empty?
+            if element['author'].is_a?(Array)
+              element['author'].each do |pubAuthor|
+                if pubAuthor.is_a?(Hash)
+                  if pubAuthor['pid'].present? && @pid == pubAuthor['pid'] && pubAuthor['orcid'].present? && pubAuthor['orcid'].is_a?(String)
+                    @author['orcid'] = pubAuthor['orcid']
+                    @author['orcidStatus'] = 'unverified'
+                  end
                 end
               end
             end
           end
-        end
 
-        if !@author['bibliography_types'].has_key? (element['type'])
-          @author['bibliography_types'][element['type']] = 1
-        else
-          @author['bibliography_types'][element['type']] += 1
-        end
+          Author.create(author_id: @pid, name: @author['name'], surname: '', orcid: @author['orcid'], orcidStatus: @author['orcidStatus'], h_index: @author['h_index'], citationNumber: @author['citationNumber'], works_count: @author['works_count'], last_known_institution: @author['last_known_institution'], last_known_institution_type: @author['last_known_institution_type'], last_known_institution_countrycode: @author['last_known_institution_countrycode'])
 
-        if @author['bibliography_types_peryear'].length > 0
-          found = false
-          @author['bibliography_types_peryear'].map { |type|
-            if type[:name] == element['type']
-              found = true
-              if !type[:data].has_key? (element['year'])
-                type[:data][element['year']] = 1
-              else
-                type[:data][element['year']] += 1
+          if !@author['bibliography_types'].has_key? (element['type'])
+            @author['bibliography_types'][element['type']] = 1
+          else
+            @author['bibliography_types'][element['type']] += 1
+          end
+
+          if @author['bibliography_types_peryear'].length > 0
+            found = false
+            @author['bibliography_types_peryear'].map { |type|
+              if type[:name] == element['type']
+                found = true
+                if !type[:data].has_key? (element['year'])
+                  type[:data][element['year']] = 1
+                else
+                  type[:data][element['year']] += 1
+                end
               end
-            end
-          }
+            }
 
-          if !found
+            if !found
+              newtype = {}
+              newtype[:name] = element['type']
+              newtype[:data] = {}
+              newtype[:data][element['year']] = 1
+              @author['bibliography_types_peryear'].append(newtype)
+            end
+          else
             newtype = {}
             newtype[:name] = element['type']
             newtype[:data] = {}
             newtype[:data][element['year']] = 1
             @author['bibliography_types_peryear'].append(newtype)
           end
-        else
-          newtype = {}
-          newtype[:name] = element['type']
-          newtype[:data] = {}
-          newtype[:data][element['year']] = 1
-          @author['bibliography_types_peryear'].append(newtype)
-        end
-        
-        if @type == 'all' || @type == element['type'] # Research by type
-          if title == '' || element['title'].downcase.include?(title.downcase) # Research by title
-            @author['bibliography'][element['year']].push(element)
+          
+          if @type == 'all' || @type == element['type'] # Research by type
+            if title == '' || element['title'].downcase.include?(title.downcase) # Research by title
+              @author['bibliography'][element['year']].push(element)
+            end
           end
+
+          url = ''
+          if element['ee'].is_a?(Hash) && element['ee']['__content__']
+            url = element['ee']['__content__']
+          elsif element['ee'].is_a?(String)
+            url = element['ee']
+          elsif element['ee'].is_a?(Array)
+            url = element['ee'][0]
+          end
+
+          Publication.create(publicationid: element['key'], year: element['year'], title: element['title'], url: url, releasedate: element['mdate'], articleType: element['type'])
+          Work.create(publication_id: element['key'], author_id: @pid)
         end
+      end unless bibliography.nil?
+
+      if @tab == 'collaborations'
+        loadColaborations()
       end
-    end unless bibliography.nil?
 
-    if @tab == 'collaborations'
-      loadColaborations()
-    end
+      if @author['orcid'].include? "https://orcid.org/"
+        @author['orcid'].slice! "https://orcid.org/"
+      end
 
-    if @author['orcid'].include? "https://orcid.org/"
-      @author['orcid'].slice! "https://orcid.org/"
+      if @author['orcid'] == ''
+        @author['citationNumber'] = 'unavailable'
+        @author['works_count'] = 'unavailable'
+        @author['h_index'] = 'unavailable'
+        @author['last_known_institution'] = 'unavailable'
+        @author['last_known_institution_type'] = 'unavailable'
+        @author['last_known_institution_countrycode'] = 'unavailable'
+        @author['counts_by_year'] = {}
+        @author['works_by_year'] = {}
+        @author['citations_counts_by_year'] = {}
+      end
+      getExtraInformation()
+      fixBibliographyTypesPerYear()
     end
-
-    if @author['orcid'] == ''
-      @author['citationNumber'] = 'unavailable'
-      @author['works_count'] = 'unavailable'
-      @author['h_index'] = 'unavailable'
-      @author['last_known_institution'] = 'unavailable'
-      @author['last_known_institution_type'] = 'unavailable'
-      @author['last_known_institution_countrycode'] = 'unavailable'
-      @author['counts_by_year'] = {}
-      @author['works_by_year'] = {}
-      @author['citations_counts_by_year'] = {}
-    end
-    getExtraInformation()
-    fixBibliographyTypesPerYear()
   end
 
   def loadColaborations()
