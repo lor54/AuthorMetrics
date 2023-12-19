@@ -1,24 +1,27 @@
 class FollowsController < ApplicationController
 
     def create
-        code = params[:author_id]
-        id = code.delete('/').to_i
-        author = Author.find_by(author_id: id)
+        id = params[:author_id]
+        author = Author.where(author_id: params[:author_id]).first
+        puts author.author_id
         if author.nil?
-            author = Author.create(author_id: id, name: params[:name])
+            flash[:notice] = "Author not found"
+            redirect_to author_path(params[:author_id])
         end
-        @follow = Follow.new(user: current_user, author_id: author.author_id)
-        if !@follow.save
-            flash[:notice] = @follow.errors.full_message.to_sentence
+        follow = Follow.create(user: current_user, author: author)
+        if follow.nil?
+            flash[:notice] = "Successfully followed the author"
+        else
+            flash[:alert] = "Error following the author"
         end
         redirect_to author_path(params[:author_id])
     end
 
     def destroy
-        @follow = current_user.follows.find(params[:id])
-        author = @follow.author
-        @follow.destroy
-        id = author.author_id.to_s.insert(-5, '/')
+        follow = current_user.follows.find(params[:id])
+        author = follow.author
+        follow.destroy
+        id = author.author_id
         redirect_to author_path(id)
     end
 

@@ -23,7 +23,7 @@ Rails.application.routes.draw do
   end
   get "/authors", to: "authors#index"
   resources :authors, only: [:show] do
-    resources :follows, path: 'author_follows/:name' , only: [:create]
+    resources :follows, path: 'author_follows' , only: [:create]
   end
   get "/authors/:id/:tab", to: "authors#show"
   get "/publications/:key", to: "publications#index"

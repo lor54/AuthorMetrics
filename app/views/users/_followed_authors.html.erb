@@ -1,11 +1,12 @@
 
 <% if current_user.follows.count > 0 %>
     <ul class="d-flex mt-2">
-        <% current_user.follows.map { |follow| Author.find_by(author_id: follow.author_id) }.sort_by(&:name).each do |author| %>
-            <% id = author.author_id.to_s.insert(-5, '/') %>
+        <% current_user.follows.each do |follow| %>
+            <% author = Author.where(author_id: follow.author_id).first %>
+            <% id = author.author_id %>
             <% name = author.name %>
             <li>
-                <%= link_to name, author_path(id), class:'btn btn-outline-secondary me-2' %>
+                <%= link_to name, author_path(follow.author_id), class:'btn btn-outline-secondary me-2' %>
             </li>
         <% end %>
     </ul>
