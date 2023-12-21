@@ -56,22 +56,6 @@ ActiveRecord::Schema[7.0].define(version: 2023_12_18_184937) do
     t.index ["author_id"], name: "index_authors_on_author_id", unique: true
   end
 
-  create_table "conferences", force: :cascade do |t|
-    t.string "confId"
-    t.string "name"
-    t.string "acronym"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-  end
-
-  create_table "editions", primary_key: ["editionId", "confId"], force: :cascade do |t|
-    t.string "name"
-    t.string "confId", null: false
-    t.integer "editionId", null: false
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-  end
-
   create_table "follows", force: :cascade do |t|
     t.integer "user_id", null: false
     t.string "author_id", null: false
