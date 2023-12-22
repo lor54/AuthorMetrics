@@ -54,26 +54,25 @@ class AuthorsController < ApplicationController
       @tab = 'publications'
     end
 
-    if Author.exists?(author_id: @pid)
-      @author = Author.find_by(author_id: @pid).as_json
-
-      @author['counts_by_year'] = {}
-      @author['works_by_year'] = {}
-      @author['citations_counts_by_year'] = {}
-      @author['bibliography'] = {}
-      @author['bibliography_types'] = {}
-      @author['bibliography_types_peryear'] = []
-      @author['works_source'] = {}
-
+    @author = {}
+    @author['counts_by_year'] = {}
+    @author['works_by_year'] = {}
+    @author['citations_counts_by_year'] = {}
+    @author['bibliography'] = {}
+    @author['bibliography_types'] = {}
+    @author['bibliography_types_peryear'] = []
+    @author['works_source'] = {}
+    
+    if Author.exists?(author_id: @pid) && Author.find_by(author_id: @pid).updated_at > 1.day.ago
       works = Work.where(author_id: @pid)
       works.each do |work|
-        @author['bibliography'][element['year']].push(Publication.find_by(publication_id: work.publication_id))
+        if !@author['bibliography'].key?(work.publication.year)
+          @author['bibliography'][work.publication.year] = []
+        end
+        @author['bibliography'][work.publication.year].push(work.publication.attributes)
       end
-      
-      p "esiste"
     else
       authorresponse = getAuthorBibliography(@pid)
-      @author = {}
       @author['orcid'] = ''
       @author['orcidStatus'] = 'none'
       @author['bibliography_types'] = {}
@@ -158,7 +157,9 @@ class AuthorsController < ApplicationController
             end
           end
 
-          Author.create(author_id: @pid, name: @author['name'], surname: '', orcid: @author['orcid'], orcidStatus: @author['orcidStatus'], h_index: @author['h_index'], citationNumber: @author['citationNumber'], works_count: @author['works_count'], last_known_institution: @author['last_known_institution'], last_known_institution_type: @author['last_known_institution_type'], last_known_institution_countrycode: @author['last_known_institution_countrycode'])
+          if !Author.exists?(author_id: @pid)
+            Author.create(author_id: @pid, name: @author['name'], surname: '', orcid: @author['orcid'], orcidStatus: @author['orcidStatus'], h_index: @author['h_index'], citationNumber: @author['citationNumber'], works_count: @author['works_count'], last_known_institution: @author['last_known_institution'], last_known_institution_type: @author['last_known_institution_type'], last_known_institution_countrycode: @author['last_known_institution_countrycode'], updated_at: DateTime.now)
+          end
 
           if !@author['bibliography_types'].has_key? (element['type'])
             @author['bibliography_types'][element['type']] = 1
@@ -209,8 +210,9 @@ class AuthorsController < ApplicationController
             url = element['ee'][0]
           end
 
-          Publication.create(publicationid: element['key'], year: element['year'], title: element['title'], url: url, releasedate: element['mdate'], articleType: element['type'])
-          Work.create(publication_id: element['key'], author_id: @pid)
+          pub = Publication.create(publicationid: element['key'], year: element['year'], title: element['title'], url: url, releasedate: element['mdate'], articleType: element['type'], updated_at: DateTime.now)
+          res = Work.create(publication: pub, author: Author.find_by(author_id: @pid))
+          p res.errors
         end
       end unless bibliography.nil?
 
