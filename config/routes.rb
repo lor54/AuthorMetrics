@@ -29,5 +29,5 @@ Rails.application.routes.draw do
   get "/publications/:key", to: "publications#index"
 
   get '/faq', to: 'faq#index'
-  get '/faq/:file_name', to: 'faq#show', as: :show_faq
+  get '/faq/:subfolder/:file_name', to: 'faq#show', as: :show_faq
 end

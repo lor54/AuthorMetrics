@@ -4,8 +4,24 @@
 <ul class="ms-5">
     <% @faq_files.each do |file_name| %>
         <% file_show = file_name.gsub("_", " ") %>
-        <li>
-            <%= link_to file_show, show_faq_path(file_name: file_name), class: 'link-secondary link-underline-opacity-0 link-underline-opacity-100-hover' %>
-        </li>
+        <% folder = File.basename(File.dirname(@file_paths[file_name])) %>
+        <% if folder == 'about' %>
+            <li>
+                <%= link_to file_show, show_faq_path(subfolder: folder, file_name: file_name), class: 'link-secondary link-underline-opacity-0 link-underline-opacity-100-hover' %>
+            </li>
+        <% end %>
+    <% end %>
+</ul>
+
+<h5 class="pt-2">About the data in AuthorMetrics</h5>
+<ul class="ms-5">
+    <% @faq_files.each do |file_name| %>
+        <% file_show = file_name.gsub("_", " ") %>
+        <% folder = File.basename(File.dirname(@file_paths[file_name])) %>
+        <% if folder == 'data' %>
+            <li>
+                <%= link_to file_show, show_faq_path(subfolder: folder, file_name: file_name), class: 'link-secondary link-underline-opacity-0 link-underline-opacity-100-hover' %>
+            </li>
+        <% end %>
     <% end %>
 </ul>
