@@ -13,7 +13,7 @@ class AuthorsController < ApplicationController
       perPage = 30
       @page = params[:page].to_i > 0 ? params[:page].to_i : 1
 
-      authorsresponse = searchAuthor(params[:name], perPage, (@page - 1)*perPage)
+      authorsresponse = Author.searchAuthor(params[:name], perPage, (@page - 1)*perPage)
 
       if authorsresponse['result']['status']['@code'] == '200'
         results = authorsresponse['result']['hits']['@sent'].to_i
@@ -55,188 +55,56 @@ class AuthorsController < ApplicationController
     end
 
     @author = {}
-    @author['counts_by_year'] = {}
-    @author['works_by_year'] = {}
-    @author['citations_counts_by_year'] = {}
     @author['bibliography'] = {}
-    @author['bibliography_types'] = {}
-    @author['bibliography_types_peryear'] = []
-    @author['works_source'] = {}
-    
-    if Author.exists?(author_id: @pid) && Author.find_by(author_id: @pid).updated_at > 1.day.ago
-      works = Work.where(author_id: @pid)
-      works.each do |work|
-        if !@author['bibliography'].key?(work.publication.year)
-          @author['bibliography'][work.publication.year] = []
+
+    author = Author.getAuthor(@pid)
+
+    if @tab == 'collaborations'
+      loadColaborations()
+    end
+
+    @author['name'] = author.name
+    @author['orcid'] = author.orcid
+    @author['orcidStatus'] = author.orcidStatus
+    @author['h_index'] = author.h_index
+    @author['citationNumber'] = author.citationNumber
+    @author['last_known_institution'] = author.last_known_institution
+    @author['last_known_institution_type'] = author.last_known_institution_type
+    @author['last_known_institution_countrycode'] = author.last_known_institution_countrycode
+    @author['works_by_year'] = author.getWorksCountByYear()
+    @author['works_count'] = author.getWorksCount()
+    @author['citations_counts_by_year'] = author.getCitationsCountByYear()
+    @author['bibliography_types'] = author.getBibliographyTypes()
+    @author['works_source'] = author.getWorksSource()
+    @author['bibliography_types_peryear'] = author.getBibliographyTypesPerYear()
+
+    if author.orcid.nil? || author.orcid == ''
+      @author['citationNumber'] = 'unavailable'
+      @author['works_count'] = 'unavailable'
+      @author['h_index'] = 'unavailable'
+      @author['last_known_institution'] = 'unavailable'
+      @author['last_known_institution_type'] = 'unavailable'
+      @author['last_known_institution_countrycode'] = 'unavailable'
+      @author['counts_by_year'] = {}
+      @author['works_by_year'] = {}
+      @author['citations_counts_by_year'] = {}
+    end
+
+    works = author.getWorks()
+    works.each do |work|
+      if !work.publication.nil?
+        pub = work.publication
+
+        if @type == 'all' || @type == element['type'] # Research by type
+          if title == '' || element['title'].downcase.include?(title.downcase) # Research by title
+            if @author['bibliography'].has_key? (pub.year)
+              @author['bibliography'][pub.year].push(pub.attributes)
+            else
+              @author['bibliography'][pub.year] = []
+            end
+          end
         end
-        @author['bibliography'][work.publication.year].push(work.publication.attributes)
       end
-    else
-      authorresponse = getAuthorBibliography(@pid)
-      @author['orcid'] = ''
-      @author['orcidStatus'] = 'none'
-      @author['bibliography_types'] = {}
-      @author['bibliography_types_peryear'] = []
-      urls = authorresponse['dblpperson']['person']['url']
-      if urls.present?
-        if urls.is_a?(Array)
-          authorresponse['dblpperson']['person']['url'].each do |url|
-            if url.include? 'orcid'
-              @author['orcid'] = url
-              @author['orcidStatus'] = 'verified'
-              break
-            end
-          end
-        elsif urls.is_a?(String)
-          @author['orcid'] = urls
-          @author['orcidStatus'] = 'verified'
-        end
-      end
-
-      @author['name'] = authorresponse['dblpperson']['name']
-      @author['pid'] = @pid
-      bibliography = authorresponse['dblpperson']['r']
-
-      @author['bibliography'] = {}
-      if bibliography.is_a?(Hash)
-        bibliography = [bibliography]
-      end
-
-      bibliography.each do |element|
-        if element.is_a?(Hash)
-          elementType = element.keys[0]
-          element = element[element.keys[0]]
-          element['type'] = elementType
-
-          if !@author['bibliography'].key?(element['year'])
-            @author['bibliography'][element['year']] = []
-          end
-
-          if element['author']
-            element['author'].collect{ |author|
-              if author.is_a?(Array)
-                if author[0] == '__content__'
-                  auth = [{'__content__' => author[1]}]
-
-                  if author[2] == 'pid'
-                    auth[0]['pid'] = author[3]
-                  end
-
-                  element['author'] = auth
-                end
-              end
-            }
-          elsif element['editor']
-            element['editor'].collect{ |author|
-              if author.is_a?(Array)
-                if author[0] == '__content__'
-                  auth = [{'__content__' => author[1]}]
-
-                  if author[2] == 'pid'
-                    auth[0]['pid'] = author[3]
-                  end
-
-                  element['author'] = auth
-                end
-              else
-                element['author'] = element['editor']
-              end
-            }
-          end
-
-          if @author['orcid'].empty?
-            if element['author'].is_a?(Array)
-              element['author'].each do |pubAuthor|
-                if pubAuthor.is_a?(Hash)
-                  if pubAuthor['pid'].present? && @pid == pubAuthor['pid'] && pubAuthor['orcid'].present? && pubAuthor['orcid'].is_a?(String)
-                    @author['orcid'] = pubAuthor['orcid']
-                    @author['orcidStatus'] = 'unverified'
-                  end
-                end
-              end
-            end
-          end
-
-          if !Author.exists?(author_id: @pid)
-            Author.create(author_id: @pid, name: @author['name'], surname: '', orcid: @author['orcid'], orcidStatus: @author['orcidStatus'], h_index: @author['h_index'], citationNumber: @author['citationNumber'], works_count: @author['works_count'], last_known_institution: @author['last_known_institution'], last_known_institution_type: @author['last_known_institution_type'], last_known_institution_countrycode: @author['last_known_institution_countrycode'], updated_at: DateTime.now)
-          end
-
-          if !@author['bibliography_types'].has_key? (element['type'])
-            @author['bibliography_types'][element['type']] = 1
-          else
-            @author['bibliography_types'][element['type']] += 1
-          end
-
-          if @author['bibliography_types_peryear'].length > 0
-            found = false
-            @author['bibliography_types_peryear'].map { |type|
-              if type[:name] == element['type']
-                found = true
-                if !type[:data].has_key? (element['year'])
-                  type[:data][element['year']] = 1
-                else
-                  type[:data][element['year']] += 1
-                end
-              end
-            }
-
-            if !found
-              newtype = {}
-              newtype[:name] = element['type']
-              newtype[:data] = {}
-              newtype[:data][element['year']] = 1
-              @author['bibliography_types_peryear'].append(newtype)
-            end
-          else
-            newtype = {}
-            newtype[:name] = element['type']
-            newtype[:data] = {}
-            newtype[:data][element['year']] = 1
-            @author['bibliography_types_peryear'].append(newtype)
-          end
-          
-          if @type == 'all' || @type == element['type'] # Research by type
-            if title == '' || element['title'].downcase.include?(title.downcase) # Research by title
-              @author['bibliography'][element['year']].push(element)
-            end
-          end
-
-          url = ''
-          if element['ee'].is_a?(Hash) && element['ee']['__content__']
-            url = element['ee']['__content__']
-          elsif element['ee'].is_a?(String)
-            url = element['ee']
-          elsif element['ee'].is_a?(Array)
-            url = element['ee'][0]
-          end
-
-          pub = Publication.create(publicationid: element['key'], year: element['year'], title: element['title'], url: url, releasedate: element['mdate'], articleType: element['type'], updated_at: DateTime.now)
-          res = Work.create(publication: pub, author: Author.find_by(author_id: @pid))
-          p res.errors
-        end
-      end unless bibliography.nil?
-
-      if @tab == 'collaborations'
-        loadColaborations()
-      end
-
-      if @author['orcid'].include? "https://orcid.org/"
-        @author['orcid'].slice! "https://orcid.org/"
-      end
-
-      if @author['orcid'] == ''
-        @author['citationNumber'] = 'unavailable'
-        @author['works_count'] = 'unavailable'
-        @author['h_index'] = 'unavailable'
-        @author['last_known_institution'] = 'unavailable'
-        @author['last_known_institution_type'] = 'unavailable'
-        @author['last_known_institution_countrycode'] = 'unavailable'
-        @author['counts_by_year'] = {}
-        @author['works_by_year'] = {}
-        @author['citations_counts_by_year'] = {}
-      end
-      getExtraInformation()
-      fixBibliographyTypesPerYear()
     end
   end
 
@@ -296,77 +164,5 @@ class AuthorsController < ApplicationController
 
     @collaborations['number'] = total_sum
     @collaborations['number'] = @collaborations['number'].sort.to_h
-  end
-
-  def getExtraInformation()
-    if @author['orcid'] != ''
-      extraInformation = HTTParty.get('https://api.openalex.org/authors/https://orcid.org/' + @author['orcid'])
-      extraInformation = extraInformation.parsed_response
-
-      @author['citationNumber'] = extraInformation['cited_by_count']
-      @author['h_index'] = extraInformation['summary_stats']['h_index']
-      @author['last_known_institution'] = extraInformation['last_known_institution']['display_name']
-      @author['last_known_institution_type'] = extraInformation['last_known_institution']['type']
-      @author['last_known_institution_countrycode'] = extraInformation['last_known_institution']['country_code']
-      citations_counts_by_year = {}
-
-      extraInformation['counts_by_year'].each do |yearData|
-        year = yearData['year'].to_s
-        if !citations_counts_by_year.has_key? (year)
-          citations_counts_by_year[year] = 0
-        end
-
-        citations_counts_by_year[year] += yearData['cited_by_count']
-      end
-      @author['citations_counts_by_year'] = citations_counts_by_year
-      @author['citations_counts_by_year'] = @author['citations_counts_by_year'].sort.to_h
-    end
-
-    @author['works_count'] = 0
-    works_counts_by_year = {}
-    @author['bibliography'].each do |year, array|
-      if !works_counts_by_year.has_key? (year)
-        works_counts_by_year[year] = 0
-      end
-
-      works_counts_by_year[year] += array.length
-      @author['works_count'] += works_counts_by_year[year]
-    end
-
-    @author['works_by_year'] = works_counts_by_year
-
-    @author['works_source'] = {}
-    if @author['works_count'] > 0
-      @author['works_source']['dblp'] = @author['works_count']
-    end
-  end
-
-  def fixBibliographyTypesPerYear()
-    @author['works_by_year'].each do |year, value|
-      @author['bibliography_types_peryear'].map { |type|
-        if !type[:data].has_key? (year)
-          type[:data][year] = 0
-        end
-      }
-    end
-
-    @author['works_by_year'] = @author['works_by_year'].sort.to_h # Graph sort by year
-    @author['bibliography_types_peryear'].map { |type| # Graph sort by year
-      type[:data] = type[:data].sort.to_h
-    }
-  end
-
-  def getAuthorInformations(orcid)
-    authoralex = HTTParty.get('https://api.openalex.org/authors/https://orcid.org/' + orcid)
-  end
-
-  def getAuthorBibliography(pid)
-    authordblp = HTTParty.get('https://dblp.org/pid/' + pid + '.xml')
-    authordblp.parsed_response
-  end
-
-  def searchAuthor(name, maxPerPage, startValue)
-    authordblp = HTTParty.get('https://dblp.org/search/author/api?q=' + name + '&h=' + maxPerPage.to_s + '&f=' + startValue.to_s + '&format=json')
-    authordblp.parsed_response
   end
 end
