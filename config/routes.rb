@@ -21,11 +21,11 @@ Rails.application.routes.draw do
   resources :conferences, only: [:index, :show]
   get "/authors", to: "authors#index"
   resources :authors, only: [:show] do
-    resources :follows, path: 'author_follows/:name' , only: [:create]
+    resources :follows, path: 'author_follows' , only: [:create]
   end
   get "/authors/:id/:tab", to: "authors#show"
   get "/publications/:key", to: "publications#index"
 
   get '/faq', to: 'faq#index'
-  get '/faq/:file_name', to: 'faq#show', as: :show_faq
+  get '/faq/:subfolder/:file_name', to: 'faq#show', as: :show_faq
 end

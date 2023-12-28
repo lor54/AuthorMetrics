@@ -4,9 +4,11 @@ class CreatePublications < ActiveRecord::Migration[7.0]
       t.string :publication_id, unique: true, foreign_key: true
       t.string :title
       t.string :url
+      t.string :articleType
       t.date :releasedate
 
       t.timestamps
+      t.index :publication_id, unique: true
     end
   end
 end

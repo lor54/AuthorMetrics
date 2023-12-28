@@ -1,15 +1,13 @@
+<% followed_authors = current_user.follows.includes(:author).map(&:author).sort_by(&:name) %>
 
-<% if current_user.follows.count > 0 %>
+<% if followed_authors.present? %>
     <ul class="d-flex mt-2">
-        <% current_user.follows.map { |follow| Author.find_by(author_id: follow.author_id) }.sort_by(&:name).each do |author| %>
-            <% id = author.author_id.to_s.insert(-5, '/') %>
-            <% name = author.name %>
-            <li>
-                <%= link_to name, author_path(id), class:'btn btn-outline-secondary me-2' %>
-            </li>
-        <% end %>
+    <% followed_authors.each do |author| %>
+        <li>
+            <%= link_to author.name, author_path(author.author_id), class: 'btn btn-outline-secondary me-2' %>
+        </li>
+    <% end %>
     </ul>
-
 <% else %>
     <div class="mt-2">
         Nessun autore seguito: clicca <%= link_to 'qui', authors_path %> per cercare un autore

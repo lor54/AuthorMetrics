@@ -6,7 +6,7 @@ class Conference < ApplicationRecord
 
 
   def self.queryConference(confId)
-    
+
   end
 
   def self.getConferenceInformation(confId)

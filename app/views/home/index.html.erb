@@ -19,3 +19,19 @@
         <% end %>
     <% end %>
 </div>
+
+<% if user_signed_in? %>
+    <h3 class="my-2">Latest Publications</h3>
+    <% followed_authors = current_user.follows.includes(:author).flat_map(&:author) %>
+    <% if followed_authors.present? %>
+        <% publications = followed_authors.flat_map(&:publications).uniq.sort_by(&:releasedate).reverse.take(7) %>
+        <ul>
+        <% publications.each do |publication| %>
+            <li class="d-flex me-2">
+                <%= link_to publication.title, publication.url, class: 'me-2' %>
+                (<%= publication.releasedate %>)
+            </li>
+        <% end %>
+        </ul>
+    <% end %>
+<% end %>

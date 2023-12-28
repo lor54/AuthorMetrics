@@ -1,5 +1,5 @@
 class Publication < ApplicationRecord
-  def self.createRecord(pubblication_id)
-
-  end
+    has_many :works
+    has_many :authors, through: :works
+    belongs_to :citation, foreign_key: :citation_id
 end

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2023_12_18_143543) do
+ActiveRecord::Schema[7.0].define(version: 2023_12_26_201324) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.string "name", null: false
     t.string "record_type", null: false
@@ -43,9 +43,14 @@ ActiveRecord::Schema[7.0].define(version: 2023_12_18_143543) do
     t.integer "author_id"
     t.string "name"
     t.string "surname"
-    t.float "hindex"
-    t.string "institution"
-    t.integer "citationsnumber"
+    t.string "orcid"
+    t.string "orcidStatus"
+    t.float "h_index"
+    t.integer "citationNumber"
+    t.integer "works_count"
+    t.string "last_known_institution"
+    t.string "last_known_institution_type"
+    t.string "last_known_institution_countrycode"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
   end
@@ -62,13 +67,16 @@ ActiveRecord::Schema[7.0].define(version: 2023_12_18_143543) do
     t.string "conference_id"
     t.string "name"
     t.string "acronym"
+  create_table "citations", force: :cascade do |t|
+    t.integer "year"
+    t.integer "citation_count"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
   end
 
   create_table "follows", force: :cascade do |t|
     t.integer "user_id", null: false
-    t.integer "author_id", null: false
+    t.string "author_id", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["user_id"], name: "index_follows_on_user_id"
@@ -84,11 +92,14 @@ ActiveRecord::Schema[7.0].define(version: 2023_12_18_143543) do
 
   create_table "publications", force: :cascade do |t|
     t.string "publication_id"
+    t.integer "year"
     t.string "title"
     t.string "url"
+    t.string "articleType"
     t.date "releasedate"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.index ["publication_id"], name: "index_publications_on_publication_id", unique: true
   end
 
   create_table "users", force: :cascade do |t|
@@ -106,6 +117,13 @@ ActiveRecord::Schema[7.0].define(version: 2023_12_18_143543) do
     t.string "uid"
     t.index ["email"], name: "index_users_on_email", unique: true
     t.index ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true
+  end
+
+  create_table "works", force: :cascade do |t|
+    t.string "publication_id", null: false
+    t.string "author_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
   end
 
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"

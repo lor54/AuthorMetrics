@@ -12,11 +12,10 @@
 <%= @author['h_index'] %><br>
 
 <% if user_signed_in? %>
-    <% id = @author['pid'].delete('/').to_i %>
-    <% author = Author.find_by(author_id: id) %>
-    <% follow = current_user.follows.find_by(author_id: author) %>
+    <% author = Author.where(author_id: @pid).first %>
+    <% follow = current_user.follows.find_by(author_id: author.author_id) %>
     <% if follow.nil? %>
-        <%= button_to 'Follow', author_follows_path(@author['pid'], @author['name']), method: :post %>
+        <%= button_to 'Follow', author_follows_path(author), method: :post %>
     <% else %>
         <%= button_to 'Unfollow', follow_path(follow), method: :delete %>
     <% end %>
