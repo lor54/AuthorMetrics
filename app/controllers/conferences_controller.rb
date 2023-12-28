@@ -2,7 +2,7 @@ require 'httparty'
 
 class ConferencesController < ApplicationController
   def index
-    @conferences = []
+    @conferences = Array.new()
     @pages = 0
     @beginPages = 1
     @endPages = 1
@@ -12,7 +12,7 @@ class ConferencesController < ApplicationController
       perPage = 30
       @page = params[:page].to_i > 0 ? params[:page].to_i : 1
 
-      conferencesResponse = searchConference(params[:name], perPage, (@page-1)*perPage)
+      conferencesResponse = Conference.searchConference(params[:name], perPage, (@page-1)*perPage)
 
       if conferencesResponse['result']['status']['@code'] == '200'
         results = conferencesResponse['result']['hits']['@sent'].to_i
@@ -28,12 +28,14 @@ class ConferencesController < ApplicationController
         end
         @beginPages = @page - @maxResultPages + 1 >= 1 ? @page - @maxResultPages + 1 : 1
         @endPages = @beginPages == 1 ? 5 : @page
-        #remove all the result that are not conferences and workshops
+        #remove all the result that are not conferences or workshops
         venueResult = conferencesResponse['result']['hits']['hit']
         if venueResult.present?
           venueResult.each do |element|
             if element['info']['type'] == 'Conference or Workshop'
-              @conferences.push(element)
+              #populate the information hash to insert in the conferences search result array
+              information = {'venue'=> element['info']['venue'], 'acronym' => element['info']['acronym'], 'accessId' => element['info']['url'].delete_prefix('https://dblp.org/db/conf/').delete_suffix('/')}
+              @conferences.push(information)
             end
           end
         end
@@ -42,69 +44,35 @@ class ConferencesController < ApplicationController
   end
 
   def show
-    @confId = params[:id] || 0
-    if Conference.exists?(confId: @confId)
-      p "esiste"
-    else
-      conferencesResponse = getConferenceInformation(@confId)
-      @conference = {}
-      @conference['name'] = conferencesResponse['bht']['h1']
-      @conference['editions'] = Hash.new
-      @conference['urlInfo'] = nil
-      #Extrapolate all the editions of the conferences in an array
-      conferenceEditions = conferencesResponse['bht']['h2']
-      editionsInformation = conferencesResponse['bht']['dblpcites']
-      if conferenceEditions.present?
-        if conferenceEditions.is_a?(Array)
-          length = conferenceEditions.length()
-          for elem in 0..length-1 do #Iterate all h2 and dblpcites elements to extrapolate the information for the editions
-            edition_name = conferenceEditions[elem].split(':')[0]
-            url_papers = []
-            if editionsInformation[elem] != nil
-              editionsInformation[elem]['r'].each do |r|
-                if r.is_a?(Hash)
-                  url_papers.push(r['proceedings']['url'])
-                elsif r.is_a?(Array)
-                  if r[0] == "proceedings"
-                    url_papers.push(r[1]['url'])
-                  end
-                end
-                if url_papers.length != 0
-                  @conference['editions'][edition_name] = url_papers
-                end
-              end
-            end
-          end
-        elsif conferenceEditions.is_a?(String)
-          edition_name = conferenceEditions.split(':')[0]
-          url_papers = []
-          if editionsInformation != nil
-            editionsInformation['r'].each do |r|
-              if r.is_a?(Hash)
-                url_papers.push(r['proceedings']['url'])
-              elsif r.is_a?(Array)
-                if r[0] == "proceedings"
-                  url_papers.push(r[1]['url'])
-                end
-              end
-              if url_papers.length != 0
-              @conference['editions'][edition_name] = url_papers
-              end
-            end
+    conferenceId = params[:id]
+    conferenceVenue = params[:venue]
+    conferenceAcronym = params[:acronym]
+    # check of existence in the database, if it doesn't insert the information in the database
+    if !(Conference.where(:conference_id => conferenceId).exists?)
+      #if not existing process information and add the conference papers and authors
+      information = Conference.getConferenceInformation(conferenceId)
+      conference = Conference.create(conference_id: conferenceId, name: conferenceVenue, acronym: conferenceAcronym)
+      information.each do |entry|
+        p entry
+        if !(Publication.where(:publication_id => entry[1].keys[0]).exists?)
+          Publication.test
+        end
+        conference.presented_papers.create(publication: entry[1].keys[0], year: entry[1]['year'])
+        entry[1]['authors'].each do |author|
+          if !(conference.conference_authors.where(:author => author[0]).exists?)
+            conference.conference_authors.create(author: author[0], publication_number: 1)
+          else
+            author_to_update = conference.conference_authors.select(:publication_number).where(:author => author.key)
+            new_publication_numbers = author_to_update.first.publNumber + 1
+            author_to_update.update(:publication_number => new_publication_numbers)
           end
         end
       end
-      #Conference.create(confId: @confId, name: conference[Name])
+    #check if the conference information has been in the last week, if so skip the update and query the database for the information
+    elsif !(Conference.select(:updated_at).where(:conference_id=> conferenceId).first.updated_at <= DateTime.now.utc.end_of_day() - 7)
+      information = Conference.getConferenceInformation(conferenceId)
+      #implement update of the conference informations
     end
   end
 
-  def getConferenceInformation(confId)
-    conferenceDblp = HTTParty.get('https://dblp.org/db/conf/' + confId + '/index.xml')
-    conferenceDblp.parsed_response
-  end
-
-  def searchConference(name, maxPerPage, startValue)
-    conferenceDblp = HTTParty.get('https://dblp.org/search/venue/api?q='+ name +'&h='+ maxPerPage.to_s + '&f='+ startValue.to_s + '&format=json')
-    conferenceDblp.parsed_response
-  end
 end

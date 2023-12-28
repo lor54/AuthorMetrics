@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2023_10_20_084925) do
+ActiveRecord::Schema[7.0].define(version: 2023_12_18_143543) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.string "name", null: false
     t.string "record_type", null: false
@@ -39,8 +39,8 @@ ActiveRecord::Schema[7.0].define(version: 2023_10_20_084925) do
     t.index ["blob_id", "variation_digest"], name: "index_active_storage_variant_records_uniqueness", unique: true
   end
 
-  create_table "authors", id: false, force: :cascade do |t|
-    t.integer "author_id", null: false
+  create_table "authors", force: :cascade do |t|
+    t.integer "author_id"
     t.string "name"
     t.string "surname"
     t.float "hindex"
@@ -48,21 +48,20 @@ ActiveRecord::Schema[7.0].define(version: 2023_10_20_084925) do
     t.integer "citationsnumber"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.index ["author_id"], name: "index_authors_on_author_id", unique: true
   end
 
-  create_table "conferences", force: :cascade do |t|
-    t.string "confId"
-    t.string "name"
-    t.string "acronym"
+  create_table "conference_authors", force: :cascade do |t|
+    t.string "author", null: false
+    t.string "conference", null: false
+    t.integer "publication_number"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
   end
 
-  create_table "editions", primary_key: ["editionId", "confId"], force: :cascade do |t|
+  create_table "conferences", force: :cascade do |t|
+    t.string "conference_id"
     t.string "name"
-    t.string "confId", null: false
-    t.integer "editionId", null: false
+    t.string "acronym"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
   end
@@ -75,8 +74,16 @@ ActiveRecord::Schema[7.0].define(version: 2023_10_20_084925) do
     t.index ["user_id"], name: "index_follows_on_user_id"
   end
 
+  create_table "presented_papers", force: :cascade do |t|
+    t.string "publication", null: false
+    t.string "conference", null: false
+    t.integer "year"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
   create_table "publications", force: :cascade do |t|
-    t.string "publicationid"
+    t.string "publication_id"
     t.string "title"
     t.string "url"
     t.date "releasedate"
@@ -103,4 +110,8 @@ ActiveRecord::Schema[7.0].define(version: 2023_10_20_084925) do
 
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
+  add_foreign_key "conference_authors", "authors", column: "author", on_delete: :cascade
+  add_foreign_key "conference_authors", "conferences", column: "conference", on_delete: :cascade
+  add_foreign_key "presented_papers", "conferences", column: "conference", on_delete: :cascade
+  add_foreign_key "presented_papers", "publications", column: "publication", on_delete: :cascade
 end

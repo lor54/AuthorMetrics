@@ -1,5 +1,5 @@
 Rails.application.routes.draw do
-  
+
   devise_for :users, controllers: {
     sessions: 'users/sessions',
     registration: 'users/registrations',
@@ -18,9 +18,7 @@ Rails.application.routes.draw do
 
   # Defines the root path route ("/")
   root "home#index"
-  resources :conferences, only: [:index, :show] do
-    resources :editions, only: [:show]
-  end
+  resources :conferences, only: [:index, :show]
   get "/authors", to: "authors#index"
   resources :authors, only: [:show] do
     resources :follows, path: 'author_follows/:name' , only: [:create]
