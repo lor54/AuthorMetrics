@@ -21,6 +21,7 @@ class Author < ApplicationRecord
 
     def self.getAuthorData(pid)
         createdAuthor = {}
+        extraInformation = {}
         authorresponse = Author.getBibliography(pid)
         
         author = {}
@@ -56,24 +57,6 @@ class Author < ApplicationRecord
             author['orcid'] = urls
             author['orcidStatus'] = 'verified'
           end
-        end
-
-        if author['orcid'] != '' && !author['orcid'].nil?
-            extraInformation = Author.getAuthorInformations(author['orcid'])
-
-            citations_counts_by_year = {}
-    
-            extraInformation['counts_by_year'].each do |yearData|
-                year = yearData['year'].to_s
-                if !citations_counts_by_year.has_key? (year)
-                    citations_counts_by_year[year] = 0
-                end
-        
-                citations_counts_by_year[year] += yearData['cited_by_count']
-            end
-    
-            author['citations_counts_by_year'] = citations_counts_by_year
-            author['citations_counts_by_year'] = author['citations_counts_by_year'].sort.to_h
         end
   
         author['name'] = authorresponse['dblpperson']['name']
@@ -143,13 +126,11 @@ class Author < ApplicationRecord
             if author['orcid'].include? "https://orcid.org/"
                 author['orcid'].slice! "https://orcid.org/"
             end
+
+            extraInformation = Author.getAuthorInformations(author['orcid'])
   
             if !Author.exists?(author_id: pid)
               createdAuthor = Author.create(author_id: pid, name: author['name'], surname: '', orcid: author['orcid'], orcidStatus: author['orcidStatus'], h_index: extraInformation['summary_stats']['h_index'], citationNumber: extraInformation['cited_by_count'], works_count: author['works_count'], last_known_institution: extraInformation['last_known_institution']['display_name'], last_known_institution_type: extraInformation['last_known_institution']['type'], last_known_institution_countrycode: extraInformation['last_known_institution']['country_code'], updated_at: DateTime.now)
-            end
-
-            author['citations_counts_by_year'].each do |year, count|
-                cit = Citation.create(year: year, citation_count: count, author: Author.find_by(author_id: pid), updated_at: DateTime.now)
             end
   
             url = ''
@@ -165,6 +146,12 @@ class Author < ApplicationRecord
             res = Work.create(publication: Publication.find_by(publication_id: element['key']), author: Author.find_by(author_id: pid))
           end
         end unless bibliography.nil?
+
+        if author['orcid'] != '' && !author['orcid'].nil?    
+            extraInformation['counts_by_year'].each do |yearData|
+                cit = Citation.create(year: yearData['year'], citation_count: yearData['cited_by_count'], author: Author.find_by(author_id: pid), updated_at: DateTime.now)
+            end
+        end
     end
 
     def self.getAuthor(pid)
