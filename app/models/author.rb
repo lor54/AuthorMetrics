@@ -64,12 +64,12 @@ class Author < ApplicationRecord
             citations_counts_by_year = {}
     
             extraInformation['counts_by_year'].each do |yearData|
-            year = yearData['year'].to_s
-            if !citations_counts_by_year.has_key? (year)
-                citations_counts_by_year[year] = 0
-            end
-    
-            citations_counts_by_year[year] += yearData['cited_by_count']
+                year = yearData['year'].to_s
+                if !citations_counts_by_year.has_key? (year)
+                    citations_counts_by_year[year] = 0
+                end
+        
+                citations_counts_by_year[year] += yearData['cited_by_count']
             end
     
             author['citations_counts_by_year'] = citations_counts_by_year
@@ -147,6 +147,10 @@ class Author < ApplicationRecord
             if !Author.exists?(author_id: pid)
               createdAuthor = Author.create(author_id: pid, name: author['name'], surname: '', orcid: author['orcid'], orcidStatus: author['orcidStatus'], h_index: extraInformation['summary_stats']['h_index'], citationNumber: extraInformation['cited_by_count'], works_count: author['works_count'], last_known_institution: extraInformation['last_known_institution']['display_name'], last_known_institution_type: extraInformation['last_known_institution']['type'], last_known_institution_countrycode: extraInformation['last_known_institution']['country_code'], updated_at: DateTime.now)
             end
+
+            author['citations_counts_by_year'].each do |year, count|
+                cit = Citation.create(year: year, citation_count: count, author: Author.find_by(author_id: pid), updated_at: DateTime.now)
+            end
   
             url = ''
             if element['ee'].is_a?(Hash) && element['ee']['__content__']
@@ -158,16 +162,13 @@ class Author < ApplicationRecord
             end
   
             pub = Publication.create(publication_id: element['key'], year: element['year'], title: element['title'], url: url, releasedate: element['mdate'], articleType: element['type'], updated_at: DateTime.now)
-            p pub
             res = Work.create(publication: Publication.find_by(publication_id: element['key']), author: Author.find_by(author_id: pid))
-            p res
-            sleep(100000)
           end
         end unless bibliography.nil?
     end
 
     def self.getAuthor(pid)
-        if !Author.exists?(author_id: pid) || Author.find_by(author_id: pid).updated_at > 1.day.ago
+        if !Author.exists?(author_id: pid) #|| Author.find_by(author_id: pid).updated_at > 1.day.ago
             Author.getAuthorData(pid)
         end
 
@@ -204,16 +205,13 @@ class Author < ApplicationRecord
     def getCitationsCountByYear()
         citations_counts_by_year = {}
 
-        works = Work.where(author_id: self.author_id)
-        works.each do |work|
-            if !work.publication.nil?
-                publ = work.publication
-                if !citations_counts_by_year.has_key? (publ.year)
-                    citations_counts_by_year[publ.year] = 0
-                end
-
-                citations_counts_by_year[publ.year] += publ.citation.citation_count
+        citations = Citation.where(author_id: self.author_id)
+        citations.each do |citation|
+            if !citations_counts_by_year.has_key? (citation.year)
+                citations_counts_by_year[citation.year] = 0
             end
+
+            citations_counts_by_year[citation.year] += citation.citation_count
         end
 
         citations_counts_by_year

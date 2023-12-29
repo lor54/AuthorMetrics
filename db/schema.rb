@@ -56,9 +56,10 @@ ActiveRecord::Schema[7.0].define(version: 2023_12_26_201324) do
     t.index ["author_id"], name: "index_authors_on_author_id", unique: true
   end
 
-  create_table "citations", force: :cascade do |t|
+  create_table "citations", primary_key: "citation_id", force: :cascade do |t|
     t.integer "year"
     t.integer "citation_count"
+    t.string "author_id", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
   end
