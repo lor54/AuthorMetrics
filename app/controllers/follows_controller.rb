@@ -9,7 +9,7 @@ class FollowsController < ApplicationController
             redirect_to author_path(params[:author_id])
         end
         follow = Follow.create(user: current_user, author: author)
-        if follow.nil?
+        if !follow.nil?
             flash[:notice] = "Successfully followed the author"
         else
             flash[:alert] = "Error following the author"

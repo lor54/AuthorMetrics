@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <h1>How accurate is the data in AuthorMetrics?</h1>
+    <div class="d-flex mt-2 mb-4">
+      ><%= link_to 'Home', root_path, class: 'mx-1' %>><%= link_to 'F.A.Q.', faq_path, class: 'mx-1' %>
+    </div>
+    <p>
+      Be assured that we take our data quality very serious
+      and we put a lot of effort into executing a process that helps to make
+      data in AuthorMetrics as reliable as humanly possible. To see this, please
+      have a look at our data curation work flow:
+      <br /><br />
+      AuthorMetrics always indexes the tables of contents of complete
+      proceedings or journal volumes in bulk. Usually, the necessary meta data
+      for each volume is obtained by us directly from the publisher of a volume
+      or the organizer of an event. In a smaller number of cases, meta data is
+      submitted to AuthorMetrics by voluntary helpers from the community. Once
+      we have obtained the data, a rigorous data cleaning process is applied by
+      an editor from the AuthorMetrics team. This process is supported by some
+      simple algorithms checking the consistency of the data, but is mainly
+      executed by hand. This manual curation process has four major goals:
+    </p>
+    <br />
+    <ul>
+      <li>
+        Uncovering typos, spelling errors, character encoding artifacts, etc. in
+        the obtained meta data.
+      </li>
+      <li>
+        Completing missing meta data, such as expanding incomplete author names
+        (e.g., abbreviated first names or missing name parts) to their full
+        form.
+      </li>
+      <li>
+        Disambiguating homonymous authors and unifying synonymous author names.
+      </li>
+      <li>
+        Correcting errors and completing missing data items that may have become
+        evident in the existing data stock in the light of the newly available
+        data.
+      </li>
+    </ul>
+    <br />
+    <p>
+      Only after a full data cleaning pass has been applied to the data, the new
+      records are added to the dblp data set. However, the data cleaning process
+      does not end here. In an iterative process, for the next few days, newly
+      added data is monitored by special helper scripts for any suspicious signs
+      of data inconsistency. For example, we often observe a certain ripple
+      effect: On the first day, a newly added publication helps to uncover
+      formerly unrecognized homonymous of synonymous data record. Thanks to
+      fixing this information, on the next day, further inconsistencies in
+      further records become evident, and so on. Such an iterative effect may
+      last for several days.
+      <br /><br />
+      In the end, as a lower bound, if you will, the data listed in dblp should
+      be at least as accurate as the data provided by the publishers. However,
+      we spent a lot of our limited resources to make sure to remove as many
+      mistakes, mis-assignments, and inconsistencies as humanly possible.
+    </p>
+  </body>
+</html>

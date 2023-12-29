@@ -178,7 +178,7 @@ GEM
       activerecord
       kaminari-core (= 1.2.2)
     kaminari-core (1.2.2)
-    loofah (2.21.3)
+    loofah (2.22.0)
       crass (~> 1.0.2)
       nokogiri (>= 1.12.0)
     mail (2.8.1)
@@ -194,8 +194,8 @@ GEM
     mime-types-data (3.2023.0808)
     mini_magick (4.12.0)
     mini_mime (1.1.5)
-    mini_portile2 (2.8.4)
-    minitest (5.19.0)
+    mini_portile2 (2.8.5)
+    minitest (5.20.0)
     msgpack (1.7.2)
     multi_json (1.15.0)
     multi_test (1.1.0)
@@ -210,7 +210,7 @@ GEM
     net-smtp (0.3.3)
       net-protocol
     nio4r (2.5.9)
-    nokogiri (1.15.4)
+    nokogiri (1.15.5)
       mini_portile2 (~> 2.8.2)
       racc (~> 1.4)
     oauth2 (1.4.11)
@@ -243,7 +243,7 @@ GEM
     public_suffix (5.0.3)
     puma (5.6.7)
       nio4r (~> 2.0)
-    racc (1.7.1)
+    racc (1.7.3)
     rack (2.2.8)
     rack-test (2.1.0)
       rack (>= 1.3)
@@ -261,6 +261,10 @@ GEM
       activesupport (= 7.0.7.2)
       bundler (>= 1.15.0)
       railties (= 7.0.7.2)
+    rails-controller-testing (1.0.5)
+      actionpack (>= 5.0.1.rc1)
+      actionview (>= 5.0.1.rc1)
+      activesupport (>= 5.0.1.rc1)
     rails-dom-testing (2.2.0)
       activesupport (>= 5.0.0)
       minitest
@@ -275,7 +279,7 @@ GEM
       rake (>= 12.2)
       thor (~> 1.0)
       zeitwerk (~> 2.5)
-    rake (13.0.6)
+    rake (13.1.0)
     rdoc (6.5.0)
       psych (>= 4.0.0)
     regexp_parser (2.8.1)
@@ -293,7 +297,7 @@ GEM
     rspec-mocks (3.12.6)
       diff-lcs (>= 1.2.0, < 2.0)
       rspec-support (~> 3.12.0)
-    rspec-rails (6.0.3)
+    rspec-rails (6.0.4)
       actionpack (>= 6.1)
       activesupport (>= 6.1)
       railties (>= 6.1)
@@ -324,7 +328,7 @@ GEM
     stringio (3.0.8)
     sys-uname (1.2.3)
       ffi (~> 1.1)
-    thor (1.2.2)
+    thor (1.3.0)
     time (0.3.0)
       date
     timeout (0.4.0)
@@ -353,7 +357,7 @@ GEM
     websocket-extensions (0.1.5)
     xpath (3.2.0)
       nokogiri (~> 1.8)
-    zeitwerk (2.6.11)
+    zeitwerk (2.6.12)
 
 PLATFORMS
   ruby
@@ -377,6 +381,7 @@ DEPENDENCIES
   open-uri
   puma (~> 5.0)
   rails (~> 7.0.7, >= 7.0.7.2)
+  rails-controller-testing
   rspec-rails (~> 6.0.0)
   selenium-webdriver
   sprockets-rails

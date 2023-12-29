@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <h1>How is the dblp website organized?</h1>
+    <div class="d-flex mt-2 mb-4">
+      ><%= link_to 'Home', root_path, class: 'mx-1' %>><%= link_to 'F.A.Q.', faq_path, class: 'mx-1' %>
+    </div>
+    <p>
+      Beside the start page, the search pages, and a number of other special
+      pages, the dblp website primarily hosts four different kind of web pages:
+    </p>
+    <ul>
+      <li>publication stream pages</li>
+      <li>table of content pages</li>
+      <li>author pages</li>
+    </ul>
+    <h5>Publication stream</h5>
+    <hr />
+    <p>
+      The next level of dblp pages are the so called publication streams, or
+      venues. A publication stream summarizes the individual proceedings volumes
+      of a conference series like VLDB or the volumes of a journal like TODS.
+      Publication stream pages contain links to the tables of contents of the
+      proceedings or journal volumes. Bibliographic information on the
+      proceedings, information on upcoming events and pointers to Web pages of
+      the publishers may also be integrated into a publication stream's page.
+    </p>
+    <h5>Table of contents</h5>
+    <hr />
+    <p>
+      The tables of contents (toc) of a journal or proceedings volume
+      (e.g.,Machine Learing 70 or ECOOP 2007) are the bottom level of the dblp
+      web structure. Here, the bibliographic metadata for each article of the
+      volume is listed, that is, the full list of authors, the title, the page
+      numbers, and any available hyperlinks. If available, session titles and
+      titles of special sections or issues are included into the toc pages. Back
+      links to the publication stream level are also provided via breadcrumbs.
+    </p>
+    <h5>Authors</h5>
+    <hr />
+    <p>
+      Whenever a person's name appears on the dblp web site, that name provides
+      a hyperlink to the author page of that person. Here, all identified
+      publications of this person are listed. If the name auf the author is a
+      known homonym, we do also provide links to all homonymous authors.
+    </p>
+  </body>
+</html>

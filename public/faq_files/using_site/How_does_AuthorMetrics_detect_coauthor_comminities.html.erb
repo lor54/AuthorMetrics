@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <h1>How does dblp detect coauthor communities?</h1>
+    <div class="d-flex mt-2 mb-4">
+      ><%= link_to 'Home', root_path, class: 'mx-1' %>><%= link_to 'F.A.Q.', faq_path, class: 'mx-1' %>
+    </div>
+    <p>
+      We use the following simple strategy to identify coauthor communities:
+      Consider the neighborhood graph consisting of the target person and all
+      (direct) coauthors of that person. Two nodes in this graph are connected
+      by an edge if and only if they are coauthors (or co-editors) of a
+      publication listed in dblp. Now remove the node of the target person and
+      all incident edges. E ach component of the remaining graph is identified
+      as a community.
+      <br /><br />
+      We make use of the coauthor communities in our quality assurance process.
+      If all coauthors seem to belong to the same community, then we are quite
+      confident that the publication entries on this page do actually belong to
+      a single person, as is intended. If the coauthor list is clustered into
+      different communities, then this might be an indicator for a case of two
+      or more homonymous authors being mixed up on a single person's page. In
+      such a case, the coauthors can often be separated in disjoint groups that
+      correspond to homonymous author entities who work in several distant
+      research areas with unconnected colleagues.
+      <br /><br />
+      However, this heuristic is not necessarily a reliable indication of the
+      absence of homonymous author entities. One scenario we encounter quite
+      often is the case when the coauthors index itself contains many homonyms.
+      In that case, these "false witnesses" given by the homonymous coauthors
+      forces the neighboring coauthor graph of a person into one big connected
+      component. Unfortunately, this scenario happens quite frequently in the
+      notoriously difficult case of Asian author names.
+      <br /><br />
+      At the same time, there are two main reasons for a fragmented coauthor
+      index to happen even in non-homonymous cases: If dblp only list a small
+      sample of the publications of a person or her community, then our data on
+      the coauthor topology is simply insufficient to yield conclusive results.
+      This happens quite often in the case of senior researchers who are working
+      in areas that are only partially covered by dblp. The other reason are
+      changes in a person's biography, such as a change of the affiliation or a
+      reorientation of a person's research interest, which may be accompanied by
+      joining a completely new research community.
+      <br /><br />
+      Therefore, checking the coauthor graph for indications of a homonym is
+      always done manually by a member of the dblp team. It remains an open
+      challenge to develop algorithms which indicate homonyms with a reliable
+      precision.
+    </p>
+  </body>
+</html>

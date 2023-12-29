@@ -3,7 +3,7 @@
 <h5 class="pt-2">About AuthorMetrics</h5>
 <ul class="ms-5">
     <% @faq_files.each do |file_name| %>
-        <% file_show = file_name.gsub("_", " ") %>
+        <% file_show = file_name.gsub("_", " ") + '?' %>
         <% folder = File.basename(File.dirname(@file_paths[file_name])) %>
         <% if folder == 'about' %>
             <li>
@@ -16,9 +16,22 @@
 <h5 class="pt-2">About the data in AuthorMetrics</h5>
 <ul class="ms-5">
     <% @faq_files.each do |file_name| %>
-        <% file_show = file_name.gsub("_", " ") %>
+        <% file_show = file_name.gsub("_", " ") + '?' %>
         <% folder = File.basename(File.dirname(@file_paths[file_name])) %>
         <% if folder == 'data' %>
+            <li>
+                <%= link_to file_show, show_faq_path(subfolder: folder, file_name: file_name), class: 'link-secondary link-underline-opacity-0 link-underline-opacity-100-hover' %>
+            </li>
+        <% end %>
+    <% end %>
+</ul>
+
+<h5 class="pt-2">Using the AuthorMetrics website</h5>
+<ul class="ms-5">
+    <% @faq_files.each do |file_name| %>
+        <% file_show = file_name.gsub("_", " ") + '?' %>
+        <% folder = File.basename(File.dirname(@file_paths[file_name])) %>
+        <% if folder == 'using_site' %>
             <li>
                 <%= link_to file_show, show_faq_path(subfolder: folder, file_name: file_name), class: 'link-secondary link-underline-opacity-0 link-underline-opacity-100-hover' %>
             </li>
