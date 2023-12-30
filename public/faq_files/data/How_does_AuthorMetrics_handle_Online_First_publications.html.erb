@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <h1>How does dblp handle Online First publications?</h1>
+    <div class="d-flex mt-2 mb-4">
+      ><%= link_to 'Home', root_path, class: 'mx-1' %>><%= link_to 'F.A.Q.', faq_path, class: 'mx-1' %>
+    </div>
+    <p>
+      dblp indexes papers and articles on a "per-volume" basis. This means we do
+      not process articles individually, we always process whole proceedings
+      volumes or journal issues/volumes at once. This is a necessary restriction
+      to keep the task of indexing thousands of computer science venues
+      manageable with such a small team.
+      <br /><br />
+      Online First publishing strategies allow readers to access articles early
+      while the containing issue/volume is still in the making. But they also
+      make indexing much more difficult for us since they publish on a
+      "per-article" basis. dblp simply does not have the resources to keep up
+      with this model of publication. In order to keep our task manageable and
+      to avoid mistakes and inconsistencies in our data (which, in the end, also
+      leads to a higher workload for us and fewer articles in dblp) we do not
+      process Online First publications unless they meet all of the following
+      properties:
+    </p>
+    <br />
+    <ul>
+      <li>
+        The core meta data (i.e., authors, title, year of publication, page
+        and/or article numbers, DOI, volume and/or issue numbers) of each Online
+        First article needs to be complete and final. We do not have the
+        resources to continuously check for updates and revise the meta data of
+        already indexed items.
+      </li><br />
+      <li>
+        The containing issue or volume of the article is complete and final,
+        i.e., no articles will removed from or added to the issue/volume at some
+        later date (with the exception of scientifically justified retractions).
+        Again, given our resources, it is infeasible for us to continuously
+        check for updates. Also, we have learned the hard way that indexing
+        incomplete issues/volumes leads to many errors on our end, such as
+        indexing only part of its contents.
+      </li><br />
+      <li>
+        We need to be able to clearly identify that the core meta data and the
+        issue's/volume's table of contents is complete and final, either trough
+        notification by the publishers or from clear information given in a
+        venue's digital library.
+      </li>
+    </ul>
+    <br />
+    <p>
+      If an Online First venue does not meet all of these criteria, processing
+      has to wait until the issue/volume has been published properly. Please
+      note that this does not exclude your Online First article from being index
+      in dblp. It just means that it will not be added to dblp as early as the
+      article is available on the publisher's website. In such a case, we ask
+      for your kind patience. We will index the completed issues/volumes as soon
+      as they are finished by the publisher.
+    </p>
+  </body>
+</html>

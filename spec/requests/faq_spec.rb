@@ -1,18 +1,29 @@
 require 'rails_helper'
 
-RSpec.describe "Faqs", type: :request do
-  describe "GET /index" do
+RSpec.describe "Faq", type: :request do
+  describe "GET /faq" do
     it "returns http success" do
-      get "/faq/index"
+      get "/faq"
       expect(response).to have_http_status(:success)
     end
   end
 
-  describe "GET /show" do
+  describe "GET /faq/:subfolder/:file_name" do
     it "returns http success" do
-      get "/faq/show"
+      file_name = "What_is_AuthorMetrics"
+      subfolder = "about"
+      path = "/faq/#{subfolder}/#{file_name}"
+      get path
       expect(response).to have_http_status(:success)
     end
-  end
 
+    it "renders the 'show' template" do
+      file_name = "What_is_AuthorMetrics"
+      subfolder = "about"
+      path = "/faq/#{subfolder}/#{file_name}"
+      get path
+      expect(response).to render_template(:show)
+    end
+    
+  end
 end

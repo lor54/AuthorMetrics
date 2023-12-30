@@ -95,13 +95,12 @@ class AuthorsController < ApplicationController
       if !work.publication.nil?
         pub = work.publication
 
-        if @type == 'all' || @type == element['type'] # Research by type
-          if title == '' || element['title'].downcase.include?(title.downcase) # Research by title
-            if @author['bibliography'].has_key? (pub.year)
-              @author['bibliography'][pub.year].push(pub.attributes)
-            else
+        if @type == 'all' || @type == pub.articleType # Research by type
+          if title == '' || pub.title.downcase.include?(title.downcase) # Research by title
+            if !@author['bibliography'].has_key? (pub.year)
               @author['bibliography'][pub.year] = []
             end
+            @author['bibliography'][pub.year].push(pub.attributes)
           end
         end
       end
