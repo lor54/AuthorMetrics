@@ -55,10 +55,10 @@ ActiveRecord::Schema[7.0].define(version: 2023_12_26_201324) do
     t.datetime "updated_at", null: false
   end
 
-  create_table "conference_authors", force: :cascade do |t|
-    t.string "author", null: false
-    t.string "conference", null: false
-    t.integer "publication_number"
+  create_table "citations", primary_key: "citation_id", force: :cascade do |t|
+    t.integer "year"
+    t.integer "citation_count"
+    t.string "author_id", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
   end
@@ -67,11 +67,6 @@ ActiveRecord::Schema[7.0].define(version: 2023_12_26_201324) do
     t.string "conference_id"
     t.string "name"
     t.string "acronym"
-  create_table "citations", force: :cascade do |t|
-  create_table "citations", primary_key: "citation_id", force: :cascade do |t|
-    t.integer "year"
-    t.integer "citation_count"
-    t.string "author_id", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
   end
@@ -84,24 +79,16 @@ ActiveRecord::Schema[7.0].define(version: 2023_12_26_201324) do
     t.index ["user_id"], name: "index_follows_on_user_id"
   end
 
-  create_table "presented_papers", force: :cascade do |t|
-    t.string "publication", null: false
-    t.string "conference", null: false
-    t.integer "year"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-  end
-
   create_table "publications", force: :cascade do |t|
     t.string "publication_id"
-    t.integer "year"
     t.string "title"
     t.string "url"
     t.string "articleType"
-    t.date "releasedate"
+    t.integer "releaseDate"
+    t.integer "conference_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.index ["publication_id"], name: "index_publications_on_publication_id", unique: true
+    t.index ["conference_id"], name: "index_publications_on_conference_id"
   end
 
   create_table "users", force: :cascade do |t|
@@ -130,8 +117,5 @@ ActiveRecord::Schema[7.0].define(version: 2023_12_26_201324) do
 
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
-  add_foreign_key "conference_authors", "authors", column: "author", on_delete: :cascade
-  add_foreign_key "conference_authors", "conferences", column: "conference", on_delete: :cascade
-  add_foreign_key "presented_papers", "conferences", column: "conference", on_delete: :cascade
-  add_foreign_key "presented_papers", "publications", column: "publication", on_delete: :cascade
+  add_foreign_key "publications", "conferences"
 end

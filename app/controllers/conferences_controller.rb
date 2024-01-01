@@ -53,12 +53,16 @@ class ConferencesController < ApplicationController
       information = Conference.getConferenceInformation(conferenceId)
       conference = Conference.create(conference_id: conferenceId, name: conferenceVenue, acronym: conferenceAcronym)
       information.each do |entry|
-        p entry
-        if !(Publication.where(:publication_id => entry[1].keys[0]).exists?)
-          Publication.test
+        #if th publication doesn't exist in the database we insert it and use it for the paper information
+        if !(Publication.where(:publication_id => entry[1]['key']).exists?)
+          publication = conference.publication.create(publication_id: entry[1]['key'], title: entry[1]['title'], articleType: entry[1]['type'] , url: entry[1]['url'], releaseDate: entry[1]['year'])
+        else
+          publication = Publication.where(:publication_id => entry[1]['key'])
+          if(publication.conference_id.is_nil?)
+            publication = Publication.update(:conference_id => conference.conference_id)
+          end
         end
-        conference.presented_papers.create(publication: entry[1].keys[0], year: entry[1]['year'])
-        entry[1]['authors'].each do |author|
+=begin          entry[1]['authors'].each do |author|
           if !(conference.conference_authors.where(:author => author[0]).exists?)
             conference.conference_authors.create(author: author[0], publication_number: 1)
           else
@@ -67,12 +71,15 @@ class ConferencesController < ApplicationController
             author_to_update.update(:publication_number => new_publication_numbers)
           end
         end
+=end
       end
     #check if the conference information has been in the last week, if so skip the update and query the database for the information
     elsif !(Conference.select(:updated_at).where(:conference_id=> conferenceId).first.updated_at <= DateTime.now.utc.end_of_day() - 7)
       information = Conference.getConferenceInformation(conferenceId)
       #implement update of the conference informations
     end
+
+
   end
 
 end

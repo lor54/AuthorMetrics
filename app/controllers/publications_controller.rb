@@ -3,7 +3,7 @@ require 'httparty'
 class PublicationsController < ApplicationController
     def index
         key = params[:key] || 0
-        publicationData = getPublicationInformation(key)
+        publicationData = Publication.getPublicationInformation(key)
         publicationData = publicationData['dblp']
 
 
@@ -41,11 +41,6 @@ class PublicationsController < ApplicationController
 
             @publication['citationsNum_peryear'] = @publication['citationsNum_peryear'].sort.to_h
         end
-    end
-
-    def getPublicationInformation(key)
-        publicationdblp = HTTParty.get('https://dblp.org/rec/' + key + '.xml')
-        publicationdblp.parsed_response
     end
 
     def getPublicationCitRef(doi)
@@ -92,7 +87,7 @@ class PublicationsController < ApplicationController
             referencesResult[reference['year']].append(ref)
         end
         referencesResult.keys.sort
-        
+
         result = {}
         result['citations'] = citationsResult
         result['references'] = referencesResult
