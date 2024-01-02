@@ -60,7 +60,7 @@ class AuthorsController < ApplicationController
     author = Author.getAuthor(@pid)
 
     if @tab == 'collaborations'
-      loadColaborations()
+      loadColaborations(author)
     end
 
     @author['name'] = author.name
@@ -107,61 +107,9 @@ class AuthorsController < ApplicationController
     end
   end
 
-  def loadColaborations()
-    @collaborations = {}
-    @collaborations['number'] = {}
-    @collaborations['data'] = {}
-    @author['bibliography'].each do |year, authors|
-      @collaborations['data'][year] = {}
-      authors.each do |element|
-        if element['author']
-          element['author'].collect{ |author|
-            if author.is_a?(Array)
-              if author[0] == '__content__'
-                auth = [{'__content__' => author[1]}]
-
-                if author[2] == 'pid'
-                  auth[0]['pid'] = author[3]
-                end
-
-                element['author'] = auth
-              end
-            end
-
-            content_key = author["__content__"]
-            pid_key = author["pid"]
-
-            next if content_key == @author['name'] && (pid_key == @author['pid'] || pid_key.nil?)
-
-            @collaborations['data'][year][content_key] ||= {}
-            @collaborations['data'][year][content_key][pid_key] ||= {}
-            @collaborations['data'][year][content_key][pid_key]['pid'] ||= pid_key
-
-            if @collaborations['data'][year][content_key][pid_key].key?('count')
-              @collaborations['data'][year][content_key][pid_key]['count'] += 1
-            else
-              @collaborations['data'][year][content_key][pid_key]['count'] = 1
-            end
-          }
-        end
-      end
-    end
-
-    total_sum = {}
-    @collaborations['data'].each do |year, year_data|
-      year_data.each do |name, name_data|
-        name_data.each do |pid, data|
-          count = data['count']
-          if total_sum.key?(year)
-            total_sum[year] += count
-          else
-            total_sum[year] = count
-          end
-        end
-      end
-    end
-
-    @collaborations['number'] = total_sum
-    @collaborations['number'] = @collaborations['number'].sort.to_h
+  def loadColaborations(author)
+    @collaborations = author.getCollaborations()
+    puts @collaborations
+    sleep(10)
   end
 end
