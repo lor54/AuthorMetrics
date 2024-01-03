@@ -45,41 +45,36 @@ class ConferencesController < ApplicationController
 
   def show
     conferenceId = params[:id]
-    conferenceVenue = params[:venue]
-    conferenceAcronym = params[:acronym]
     # check of existence in the database, if it doesn't insert the information in the database
     if !(Conference.where(:conference_id => conferenceId).exists?)
       #if not existing process information and add the conference papers and authors
       information = Conference.getConferenceInformation(conferenceId)
-      conference = Conference.create(conference_id: conferenceId, name: conferenceVenue, acronym: conferenceAcronym)
+      conferenceVenue = HTTParty.get("https://dblp.org/db/conf/"+ conferenceId +"/index.xml").parsed_response['bht']['h1']
+      conference = Conference.create(conference_id: conferenceId, name: conferenceVenue)
       information.each do |entry|
         #if th publication doesn't exist in the database we insert it and use it for the paper information
         if !(Publication.where(:publication_id => entry[1]['key']).exists?)
-          publication = conference.publication.create(publication_id: entry[1]['key'], title: entry[1]['title'], articleType: entry[1]['type'] , url: entry[1]['url'], releaseDate: entry[1]['year'])
+          publication = conference.publications.create(publication_id: entry[1]['key'], title: entry[1]['title'], articleType: entry[1]['type'] , url: entry[1]['url'], releaseDate: entry[1]['year'], conference_id: conference.conference_id)
         else
           publication = Publication.where(:publication_id => entry[1]['key'])
           if(publication.conference_id.is_nil?)
             publication = Publication.update(:conference_id => conference.conference_id)
           end
         end
-=begin          entry[1]['authors'].each do |author|
-          if !(conference.conference_authors.where(:author => author[0]).exists?)
-            conference.conference_authors.create(author: author[0], publication_number: 1)
-          else
-            author_to_update = conference.conference_authors.select(:publication_number).where(:author => author.key)
-            new_publication_numbers = author_to_update.first.publNumber + 1
-            author_to_update.update(:publication_number => new_publication_numbers)
-          end
-        end
-=end
+        #if !(entry[1]['authors'].empty?)
+        #  entry[1]['authors'].each do |author|
+        #    #dovrebbe salvare gli autori nel database da vedere se lo fa
+        #    Author.getAuthorData(author)
+        #  end
+        #end
       end
     #check if the conference information has been in the last week, if so skip the update and query the database for the information
     elsif !(Conference.select(:updated_at).where(:conference_id=> conferenceId).first.updated_at <= DateTime.now.utc.end_of_day() - 7)
       information = Conference.getConferenceInformation(conferenceId)
       #implement update of the conference informations
     end
-
-
+    #we extract the information from the database
+    @information = Conference.getConferenceDatabase(conferenceId)
   end
 
 end

@@ -6,7 +6,7 @@ class CreatePublications < ActiveRecord::Migration[7.0]
       t.string :url
       t.string :articleType
       t.integer :releaseDate
-      t.belongs_to :conference, foreign_key: true
+
 
       t.timestamps
     end

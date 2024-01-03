@@ -10,7 +10,7 @@
 <ul>
   <% @conferences.each do |conference| %>
     <li>
-        <%= link_to conference['venue'], conference_path(id: conference['accessId'], venue: conference['venue'], acronym: conference['acronym'])%>
+        <%= link_to conference['venue'], conference_path(id: conference['accessId'])%>
     </li>
   <% end %>
 </ul>

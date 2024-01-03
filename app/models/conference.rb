@@ -1,5 +1,5 @@
 class Conference < ApplicationRecord
-  has_many :publications, foreign_key: "publication_id"
+  has_many :publications, foreign_key: "conference_id"
 
   def self.queryConference(confId)
 
@@ -7,27 +7,36 @@ class Conference < ApplicationRecord
 
   def self.getConferenceInformation(confId)
     starting = 0;
+    # we ask for 10k elements as first request (most conferences will give all of their information within this first request)
+    numberElements = 10000
     completed = false
     results = Hash.new()
     elemNumber = 0
     until completed
-      publicationInfoDblp = HTTParty.get('https://dblp.org/search/publ/api?q=stream:streams/conf/' + confId + ':&h=1000&f=' + starting.to_s + '&format=json').parsed_response
-      #check for correct answer from the API call
-      p publicationInfoDblp
-      if publicationInfoDblp['result']['status']['@code'].to_i != 200
-        return 'There has been an error'
+      publicationInfoDblp = HTTParty.get('https://dblp.org/search/publ/api?q=stream:streams/conf/' + confId + ':&h=' + numberElements.to_s + '&f=' + starting.to_s + '&format=json').parsed_response
+      #########################################################################
+      # this doesn't work, because if they send 0 they put status code 200 OK #
+      #if publicationInfoDblp['result']['status']['@code'].to_i != 200        #
+      #  return 'There has been an error'                                     #
+      #end                                                                    #
+      #########################################################################
+      #check for correct answer from the API call, if the sent are 0 we return the results
+      if publicationInfoDblp['result']['hits']['@sent'].to_i == 0
+        return results
       end
       #extraction of publication and population of the hash to return
       for elem in publicationInfoDblp['result']['hits']['hit'] do
-        authors = Hash.new()
-        #population of the array of authors that wrote the paper where the key is their PID and the value is their name/
-        if elem['info']['authors']['author'].is_a?(Array)
+        authors = Array.new()
+        #population of the array of authors that wrote the paper
+        if elem['info']['authors'].nil?
+          #if the authors are not present we do nothing
+        elsif elem['info']['authors']['author'].is_a?(Array)
           for author in elem['info']['authors']['author'] do
-            authors[author['@pid']] = author['text']
+            authors.push(author['@pid'])
           end
         else
-          # it is an hash so we can directly extract the information and insert them into the main hash
-          authors[elem['info']['authors']['author']['@pid']] = elem['info']['authors']['author']['text']
+          # it is an hash so we can directly extract the information and insert them into the author array
+          authors.push(elem['info']['authors']['author']['@pid'])
         end
         information = {'key' => elem['info']['key'], 'title' => elem['info']['title'], 'type' => elem['info']['type'], 'authors' => authors, 'url' => elem['info']['ee'], 'year' => elem['info']['year'] }
         results[elemNumber] = information
@@ -38,7 +47,8 @@ class Conference < ApplicationRecord
         completed = true
       else
         #get the next thousand records
-        starting += 1000
+        starting += numberElement
+        numberElement = 1000
       end
     end
     return results
@@ -49,4 +59,11 @@ class Conference < ApplicationRecord
     conferenceDblp.parsed_response
   end
 
+  def self.getConferenceDatabase(conferenceId)
+    information = Hash.new()
+    conference = Conference.where(:conference_id => conferenceId)[0]
+    information['publications'] = conference.publications
+    information['name'] = conference.name
+    return information
+  end
 end

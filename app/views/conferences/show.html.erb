@@ -1,3 +1,12 @@
 <div>
-   <h1>Name conference placeholder</h1>
+   <h1><%= @information['name']%></h1>
+   <div>
+      <h3>Papers of the conference</h3>
+      <% @information['publications'].each do |info|%>
+         <div><%= info.title%></div>
+         <div><%= link_to "read paper", info.url %></div>
+         <div><%= info.releaseDate%></div>
+         <div>-------------------</div>
+      <%end %>
+   </div>
 </div>
