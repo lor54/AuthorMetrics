@@ -51,6 +51,7 @@ ActiveRecord::Schema[7.0].define(version: 2024_01_03_112944) do
     t.string "last_known_institution"
     t.string "last_known_institution_type"
     t.string "last_known_institution_countrycode"
+    t.boolean "completed", default: false, null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
   end

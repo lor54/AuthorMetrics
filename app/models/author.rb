@@ -127,10 +127,19 @@ class Author < ApplicationRecord
                 author['orcid'].slice! "https://orcid.org/"
             end
 
-            extraInformation = Author.getAuthorInformations(author['orcid'])
-  
+            extraInformation = {}
+            extraInformation['last_known_institution'] = {}
+            extraInformation['summary_stats'] = {}
+            if author['orcid'] != '' && !author['orcid'].nil?
+                extraInformation = Author.getAuthorInformations(author['orcid'])
+            end
+
             if !Author.exists?(author_id: pid)
-              createdAuthor = Author.create(author_id: pid, name: author['name'], surname: '', orcid: author['orcid'], orcidStatus: author['orcidStatus'], h_index: extraInformation['summary_stats']['h_index'], citationNumber: extraInformation['cited_by_count'], works_count: author['works_count'], last_known_institution: extraInformation['last_known_institution']['display_name'], last_known_institution_type: extraInformation['last_known_institution']['type'], last_known_institution_countrycode: extraInformation['last_known_institution']['country_code'], updated_at: DateTime.now)
+                p 'provaaa'
+                p author
+              createdAuthor = Author.create(author_id: pid, name: author['name'], surname: '', orcid: author['orcid'], orcidStatus: author['orcidStatus'], h_index: extraInformation['summary_stats']['h_index'], citationNumber: extraInformation['cited_by_count'], works_count: author['works_count'], last_known_institution: extraInformation['last_known_institution']['display_name'], last_known_institution_type: extraInformation['last_known_institution']['type'], last_known_institution_countrycode: extraInformation['last_known_institution']['country_code'], completed: true, updated_at: DateTime.now)
+            elsif Author.find_by(author_id: pid).completed == false
+                Author.update(author_id: pid, name: author['name'], surname: '', orcid: author['orcid'], orcidStatus: author['orcidStatus'], h_index: extraInformation['summary_stats']['h_index'], citationNumber: extraInformation['cited_by_count'], works_count: author['works_count'], last_known_institution: extraInformation['last_known_institution']['display_name'], last_known_institution_type: extraInformation['last_known_institution']['type'], last_known_institution_countrycode: extraInformation['last_known_institution']['country_code'], completed: true, updated_at: DateTime.now)
             end
   
             url = ''
@@ -144,7 +153,20 @@ class Author < ApplicationRecord
   
             pub = Publication.create(publication_id: element['key'], year: element['year'], title: element['title'], url: url, releasedate: element['mdate'], articleType: element['type'], updated_at: DateTime.now)
             res = Work.create(publication: Publication.find_by(publication_id: element['key']), author: Author.find_by(author_id: pid))
-          end
+
+            element['author'].each do |pubAuthor|
+                if pubAuthor.is_a?(Hash)
+                    if pubAuthor['pid'].present? && pubAuthor['pid'] != pid
+                        p pubAuthor
+                        if !Author.exists?(author_id: pubAuthor['pid'])
+                            Author.create(author_id: pubAuthor['pid'], name: pubAuthor['__content__'], completed: false)
+                            Work.create(publication: Publication.find_by(publication_id: element['key']), author: Author.find_by(author_id: pubAuthor['pid']))
+                        end
+                    end
+                end
+            end
+
+            end
         end unless bibliography.nil?
 
         if author['orcid'] != '' && !author['orcid'].nil?    
@@ -246,5 +268,50 @@ class Author < ApplicationRecord
         end
 
         bibliography_types_peryear
+    end
+
+    def getCollaborations()
+        collaborations = {}
+        collaborations['number'] = {}
+        collaborations['data'] = {}
+
+        Work.where(author_id: author_id).each do |work|
+            Work.where(publication_id: work.publication_id).each do |work2|
+                year = work2.publication.year
+                collaborations['data'][year] = {}
+
+                content_key = work2.author.name
+                pid_key = work2.author.author_id
+
+                next if content_key == name && (pid_key == author_id || pid_key.nil?)
+
+                collaborations['data'][year][content_key] ||= {}
+                collaborations['data'][year][content_key][pid_key] ||= {}
+                collaborations['data'][year][content_key][pid_key]['pid'] ||= pid_key
+
+                if collaborations['data'][year][content_key][pid_key].key?('count')
+                    collaborations['data'][year][content_key][pid_key]['count'] += 1
+                else
+                    collaborations['data'][year][content_key][pid_key]['count'] = 1
+                end
+            end
+        end
+
+        total_sum = {}
+        collaborations['data'].each do |year, year_data|
+            year_data.each do |name, name_data|
+                name_data.each do |pid, data|
+                    count = data['count']
+                    if total_sum.key?(year)
+                        total_sum[year] += count
+                    else
+                        total_sum[year] = count
+                    end
+                end
+            end
+        end
+        collaborations['number'] = total_sum
+        collaborations['number'] = collaborations['number'].sort.to_h
+        collaborations
     end
 end
