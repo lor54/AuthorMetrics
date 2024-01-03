@@ -256,19 +256,23 @@ class Author < ApplicationRecord
     def getBibliographyTypesPerYear()
         bibliography_types_peryear = {}
 
-        publications = Publication.joins(:works).where(works: {author_id: self.author_id})
-        publications.each do |publication|
-            if !bibliography_types_peryear.has_key? (publication.year)
-                bibliography_types_peryear[publication.year] = {}
-            else
-                if !bibliography_types_peryear[publication.year].has_key? (publication.articleType)
-                    bibliography_types_peryear[publication.year][publication.articleType] = 1
-                else
-                    bibliography_types_peryear[publication.year][publication.articleType] += 1
-                end
-            end
+        distinct_types = Publication.distinct.pluck(:articleType)
+        distinct_years = Publication.distinct.pluck(:year)
+      
+        all_combinations = distinct_types.product(distinct_years)
+      
+        all_combinations.each do |combination|
+          bibliography_types_peryear[combination] = 0
         end
 
+        publications = Publication.joins(:works).where(works: {author_id: author_id})
+        publications.each do |publication|
+          year = publication.year
+          article_type = publication.articleType
+      
+          key = [article_type, year]
+          bibliography_types_peryear[key] += 1
+        end
         bibliography_types_peryear
     end
 

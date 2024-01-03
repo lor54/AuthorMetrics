@@ -77,7 +77,7 @@ class AuthorsController < ApplicationController
     @author['bibliography_types'] = author.getBibliographyTypes()
     @author['works_source'] = author.getWorksSource()
     @author['bibliography_types_peryear'] = author.getBibliographyTypesPerYear()
-
+    
     if author.orcid.nil? || author.orcid == ''
       @author['citationNumber'] = 'unavailable'
       @author['works_count'] = 'unavailable'
@@ -94,13 +94,23 @@ class AuthorsController < ApplicationController
     works.each do |work|
       if !work.publication.nil?
         pub = work.publication
+        otherAuthors = Work
+        .joins(:author)
+        .where(publication_id: pub.id)
+        .where.not(author_id: author.id)
+        .distinct
+        .pluck('authors.author_id', 'authors.name')
+        .map { |author_id, name| { 'pid' => author_id, '__content__' => name } }
+        atrr = pub.attributes
+        atrr['author'] = otherAuthors
 
         if @type == 'all' || @type == pub.articleType # Research by type
           if title == '' || pub.title.downcase.include?(title.downcase) # Research by title
             if !@author['bibliography'].has_key? (pub.year)
               @author['bibliography'][pub.year] = []
             end
-            @author['bibliography'][pub.year].push(pub.attributes)
+            
+            @author['bibliography'][pub.year].push(atrr)
           end
         end
       end
