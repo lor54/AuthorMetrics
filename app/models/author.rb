@@ -128,9 +128,10 @@ class Author < ApplicationRecord
             end
 
             if !Author.exists?(author_id: pid)
-                createdAuthor = Author.create(author_id: pid, name: author['name'], surname: '', orcid: author['orcid'], orcidStatus: author['orcidStatus'], works_count: author['works_count'], completed: true, updated_at: DateTime.now)
+              createdAuthor = Author.create(author_id: pid, name: author['name'], surname: '', orcid: author['orcid'], orcidStatus: author['orcidStatus'], works_count: author['works_count'], completed: true, updated_at: DateTime.now)
             elsif Author.find_by(author_id: pid).completed == false
-                Author.update(author_id: pid, name: author['name'], surname: '', orcid: author['orcid'], orcidStatus: author['orcidStatus'], h_index: extraInformation['summary_stats']['h_index'], citationNumber: extraInformation['cited_by_count'], works_count: author['works_count'], last_known_institution: extraInformation['last_known_institution']['display_name'], last_known_institution_type: extraInformation['last_known_institution']['type'], last_known_institution_countrycode: extraInformation['last_known_institution']['country_code'], completed: true, updated_at: DateTime.now)
+              authorToUpdate = Author.find_by(author_id: pid)
+              authorToUpdate.update(author_id: pid, name: author['name'], surname: '', orcid: author['orcid'], orcidStatus: author['orcidStatus'], works_count: author['works_count'], completed: true, updated_at: DateTime.now)
             end
   
             url = ''
@@ -141,9 +142,11 @@ class Author < ApplicationRecord
             elsif element['ee'].is_a?(Array)
               url = element['ee'][0]
             end
-  
-            pub = Publication.create(publication_id: element['key'], year: element['year'], title: element['title'], url: url, releasedate: element['mdate'], articleType: element['type'], updated_at: DateTime.now)
-            res = Work.create(publication: Publication.find_by(publication_id: element['key']), author: Author.find_by(author_id: pid))
+            
+            if(!Publication.exists?(publication_id: element['key']))
+              pub = Publication.create(publication_id: element['key'], year: element['year'], title: element['title'], url: url, releasedate: element['mdate'], articleType: element['type'], updated_at: DateTime.now)
+            end
+            Work.create(publication: Publication.find_by(publication_id: element['key']), author: Author.find_by(author_id: pid))
 
             element['author'].each do |pubAuthor|
                 if pubAuthor.is_a?(Hash)
@@ -176,7 +179,7 @@ class Author < ApplicationRecord
     end
 
     def self.getAuthor(pid)
-        if !Author.exists?(author_id: pid) #|| Author.find_by(author_id: pid).updated_at > 1.day.ago
+        if !Author.exists?(author_id: pid) || Author.find_by(author_id: pid).completed == false #|| Author.find_by(author_id: pid).updated_at > 1.day.ago
             Author.getAuthorData(pid)
         end
 
