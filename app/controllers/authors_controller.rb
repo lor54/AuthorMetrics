@@ -109,7 +109,5 @@ class AuthorsController < ApplicationController
 
   def loadColaborations(author)
     @collaborations = author.getCollaborations()
-    puts @collaborations
-    sleep(10)
   end
 end

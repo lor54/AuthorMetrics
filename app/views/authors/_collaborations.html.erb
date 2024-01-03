@@ -13,7 +13,6 @@
                         <% end %>
                     <% else %>
                         <a href="/authors/<%= ERB::Util.url_encode(element[1][element[1].keys[0]]['pid']) %>"><%= element[0] %></a>
-                        <%= element[1][element[1].keys[0]]['count'] %>
                     <% end %>
                 <% end %>
                 <br>
