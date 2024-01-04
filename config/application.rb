@@ -18,5 +18,7 @@ module AuthorMetrics
     #
     # config.time_zone = "Central Time (US & Canada)"
     # config.eager_load_paths << Rails.root.join("extras")
+    config.active_storage.variable_content_types += ['image/jpg']
+    config.active_storage.silence_invalid_content_types_warning = true
   end
 end
