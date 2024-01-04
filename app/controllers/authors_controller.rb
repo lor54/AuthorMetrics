@@ -77,7 +77,7 @@ class AuthorsController < ApplicationController
     @author['bibliography_types'] = author.getBibliographyTypes()
     @author['works_source'] = author.getWorksSource()
     @author['bibliography_types_peryear'] = author.getBibliographyTypesPerYear()
-
+    
     if author.orcid.nil? || author.orcid == ''
       @author['citationNumber'] = 'unavailable'
       @author['works_count'] = 'unavailable'
@@ -94,22 +94,43 @@ class AuthorsController < ApplicationController
     works.each do |work|
       if !work.publication.nil?
         pub = work.publication
-
-        if @type == 'all' || @type == pub.articleType # Research by type
-          if title == '' || pub.title.downcase.include?(title.downcase) # Research by title
-            if !@author['bibliography'].has_key? (pub.year)
-              @author['bibliography'][pub.year] = []
-            end
-            @author['bibliography'][pub.year].push(pub.attributes)
-          end
-        end
+        otherAuthors = Work
+        .joins(:author)
+        .where(publication_id: pub.id)
+        .where.not(author_id: author.id)
+        .distinct
+        .pluck('authors.author_id', 'authors.name')
+        .map { |author_id, name| { 'pid' => author_id, '__content__' => name } }
+        atrr = pub.attributes
+        atrr['author'] = otherAuthors
       end
+    end
+
+    if @type == 'all'
+      if title != ''
+        @author['bibliography'] = Work.joins(:publication, :author)
+        .where("publications.title LIKE ?", "%#{title}%")
+        .where(authors: { author_id: author.author_id })
+        .paginate(page: params[:page], per_page: 9)
+      else
+        @author['bibliography'] = Work.joins(:publication).where(author_id: author.author_id).select('publications.*').paginate(:page => params[:page], :per_page => 9)
+      end
+    else
+      @author['bibliography'] = Work.joins(:publication, :author)
+      .where("publications.title LIKE ?", "%#{title}%")
+      .where(authors: { author_id: author.author_id })
+      .where(publications: { articleType: @type })
+      .paginate(page: params[:page], per_page: 9)
     end
   end
 
   def loadColaborations(author)
     @collaborations = author.getCollaborations()
-    puts @collaborations
-    sleep(10)
+
+    @author['collaborations'] = []
+    @collaborations['data'].each do |year|
+      puts collaboration
+      sleep(5)
+    end
   end
 end
