@@ -1,20 +1,22 @@
 class FollowsController < ApplicationController
+    before_action :authenticate_user!
 
     def create
         id = params[:author_id]
         author = Author.where(author_id: params[:author_id]).first
-        puts author.author_id
         if author.nil?
             flash[:notice] = "Author not found"
+            redirect_to authors_path
+        else
+            follow = Follow.where(user: current_user, author: author).first
+            if !follow.nil?
+                flash[:alert] = "You are already following this author"
+            else
+                follow = Follow.create(user: current_user, author: author)
+                flash.now[:notice] = "Successfully followed the author"
+            end
             redirect_to author_path(params[:author_id])
         end
-        follow = Follow.create(user: current_user, author: author)
-        if !follow.nil?
-            flash[:notice] = "Successfully followed the author"
-        else
-            flash[:alert] = "Error following the author"
-        end
-        redirect_to author_path(params[:author_id])
     end
 
     def destroy
@@ -22,6 +24,7 @@ class FollowsController < ApplicationController
         author = follow.author
         follow.destroy
         id = author.author_id
+        flash[:notice] = "Successfully unfollowed the author"
         redirect_to author_path(id)
     end
 

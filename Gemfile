@@ -95,3 +95,7 @@ gem 'rails-controller-testing'
 
 gem 'will_paginate', '~> 4.0'
 gem 'will_paginate-bootstrap-style'
+
+group :test do
+  gem 'factory_bot_rails' 
+end

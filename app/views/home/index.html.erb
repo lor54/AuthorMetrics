@@ -1,4 +1,4 @@
-<h1>Welcome to AuthorMetrics</h1>
+<h1 class="mb-5">Welcome to AuthorMetrics</h1>
 
 <h3>Search Authors</h3>
 <div class="d-inline-flex p-2">
@@ -21,10 +21,10 @@
 </div>
 
 <% if user_signed_in? %>
-    <h3 class="my-2">Latest Publications</h3>
     <% followed_authors = current_user.follows.includes(:author).flat_map(&:author) %>
     <% if followed_authors.present? %>
         <% publications = followed_authors.flat_map(&:publications).uniq.sort_by(&:releasedate).reverse.take(7) %>
+        <h3 class="my-2">Latest Publications</h3>
         <ul>
         <% publications.each do |publication| %>
             <li class="d-flex me-2">
