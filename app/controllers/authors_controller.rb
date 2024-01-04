@@ -103,21 +103,34 @@ class AuthorsController < ApplicationController
         .map { |author_id, name| { 'pid' => author_id, '__content__' => name } }
         atrr = pub.attributes
         atrr['author'] = otherAuthors
-
-        if @type == 'all' || @type == pub.articleType # Research by type
-          if title == '' || pub.title.downcase.include?(title.downcase) # Research by title
-            if !@author['bibliography'].has_key? (pub.year)
-              @author['bibliography'][pub.year] = []
-            end
-            
-            @author['bibliography'][pub.year].push(atrr)
-          end
-        end
       end
+    end
+
+    if @type == 'all'
+      if title != ''
+        @author['bibliography'] = Work.joins(:publication, :author)
+        .where("publications.title LIKE ?", "%#{title}%")
+        .where(authors: { author_id: author.author_id })
+        .paginate(page: params[:page], per_page: 9)
+      else
+        @author['bibliography'] = Work.joins(:publication).where(author_id: author.author_id).select('publications.*').paginate(:page => params[:page], :per_page => 9)
+      end
+    else
+      @author['bibliography'] = Work.joins(:publication, :author)
+      .where("publications.title LIKE ?", "%#{title}%")
+      .where(authors: { author_id: author.author_id })
+      .where(publications: { articleType: @type })
+      .paginate(page: params[:page], per_page: 9)
     end
   end
 
   def loadColaborations(author)
     @collaborations = author.getCollaborations()
+
+    @author['collaborations'] = []
+    @collaborations['data'].each do |year|
+      puts collaboration
+      sleep(5)
+    end
   end
 end

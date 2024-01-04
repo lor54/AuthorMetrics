@@ -1,82 +1,69 @@
-<p>Pubblicazioni</p>
-
-<%# Search Bar %>
-<%= form_tag request.path, method: "GET" do %>
-  <%= label_tag :title %>
-  <%= text_field_tag :title, params[:title] %>
-
-  <%= label_tag :type %>
-  <%= select_tag :type, options_for_select(@types, @type) %> 
-  <%= submit_tag "Search" %>
-<% end %>
-
-<h2>Bibliografia: </h2>
-<ul>
-<% @author['bibliography'].each do |year| %>
-    <li>
-        <ul>
-            <%= year[0] %><br>
-            <% year[1].each do |element| %>
-                <%= element %>
-                <li>
-                    <%# Title %>
-                    <a href="/publications/<%= ERB::Util.url_encode(element['key']) %>"><%= element['title'] %></a>
-
-                    <%# Paper document %>
-                    <% if element['ee'].is_a?(Hash) && element['ee']['__content__'] %>
-                        <a target="_blank" href="<%= element['ee']['__content__'] %>">Document Link</a>
-                    <% elsif element['ee'].is_a?(String) %>
-                        <a target="_blank" href="<%= element['ee'] %>">Document Link</a>
-                    <% elsif element['ee'].is_a?(Array) %>
-                        <a target="_blank" href="<%= element['ee'][0] %>">Document Link</a>
-                    <% end %>
-
-                    <%# Authors list %>
-                    <% if element['author'] %>
-                    <br>
-                    Authors:
-                    <ul>
-                        <% element['author'].each do |author| %>
-                            <li>
-                                <% if author['pid'].present? && author['pid'] != @author['pid'] %>
-                                    <a href="<%= getUrlEncodedPid(author['pid']) %>"><%= author['__content__'] %></a>
-                                <% else %>
-                                    <%= author['__content__'] %>
-                                <% end %>
-                            </li>
-                        <% end %>
-                    </ul>
-                    <% end %>
-                </li>
-                <br>
-            <% end %>
-        </ul>
-    </li>
-<% end %>
-</ul>
 
 <div class="container">
-    <div class="row">
-        <div class="col-xs-6">
-            <div class="tab-content">
-                
+  <div class="row">
+    <div class="col-md-6">
+
+    <%# Search Bar %>
+    <%= form_tag request.path, method: "GET", style: 'none', class: 'w-100' do %>
+        <div class="row g-3 align-items-center">
+            <div class="col-auto">
+                <label class="col-form-label">Title</label>
+            </div>
+            <div class="col-auto">
+                <%= text_field_tag :title, params[:title], class: 'form-control', placeholder: 'Title' %>
+            </div>
+            <div class="col-auto">
+                <label class="col-form-label">Type</label>
+            </div>
+            <div class="col-auto">
+                <%= select_tag :type, options_for_select(@types, @type), class: 'form-select' %> 
+            </div>
+            <div class="col-auto">
+                <%= submit_tag "Search", class: 'btn btn-primary btn-submit' %>
             </div>
         </div>
-        <div class="col-xs-6">
-            <% if @author['bibliography_types'].keys.length > 0 %>
-                <h3> Pubblicazioni per tipologia: </h3>
-                <%= pie_chart @author['bibliography_types'] %>
-            <% end %>
+    <% end %>
 
-            <% if @author['works_source'].keys.length > 0 %>
-                <h3> Pubblicazioni per tipologia per sorgente: </h3>
-                <%= pie_chart @author['works_source'] %>
-            <% end %>
+    <br>
 
-            <% if @author['bibliography_types_peryear'].length > 0 %>
-                <h3> Pubblicazioni per tipologia per anno e per tipo: </h3>
-                <%= line_chart @author['bibliography_types_peryear'], zeros: true %>
+    <table class="table table-striped table-bordered">
+        <thead>
+            <tr>
+            <th scope="col">Title</th>
+            <th scope="col">Type</th>
+            <th scope="col">Year</th>
+            </tr>
+        </thead>
+        <tbody>
+            <% @author['bibliography'].each do |post| %>
+            <tr>
+                <td><%= post.publication.title %></td>
+                <td><%= post.publication.articleType %></td>
+                <td><%= post.publication.year %></td>
+            </tr>
             <% end %>
-        </div>
+        </tbody>
+    </table>
+
+    <%= will_paginate @author['bibliography'], renderer: WillPaginate::ActionView::BootstrapLinkRenderer %>
+
     </div>
+
+    <div class="col-md-6">
+        <% if @author['bibliography_types'].keys.length > 0 %>
+            <h3> Pubblicazioni per tipologia: </h3>
+            <%= pie_chart @author['bibliography_types'] %>
+        <% end %>
+
+        <% if @author['works_source'].keys.length > 0 %>
+            <h3> Pubblicazioni per tipologia per sorgente: </h3>
+            <%= pie_chart @author['works_source'] %>
+        <% end %>
+
+        <% if @author['bibliography_types_peryear'].length > 0 %>
+            <h3> Pubblicazioni per tipologia per anno e per tipo: </h3>
+            <%= line_chart @author['bibliography_types_peryear'], zeros: true %>
+        <% end %>
+    </div>
+  </div>
 </div>

@@ -280,9 +280,13 @@ class Author < ApplicationRecord
         collaborations = {}
         collaborations['number'] = {}
         collaborations['data'] = {}
+        collaborations['years'] = []
 
         Work.where(author_id: author_id).each do |work|
           year = work.publication.year
+          if !collaborations['years'].include? (year)
+            collaborations['years'].push(year)
+          end
           collaborations['data'][year] ||= {}
         
           Work.where(publication_id: work.publication_id).each do |work2|

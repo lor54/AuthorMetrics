@@ -1,39 +1,46 @@
-<p>Collaborazioni</p>
-
-<ul>
-    <% @collaborations['data'].each do |year| %>
-        <li>
-            <%= year[0] %>
-            <br>
-            <% year[1].each do |element| %>
-                <% if element[1].is_a?(Hash) %>
-                    <%if element[1].keys.count > 1 %>
-                        <% element[1].each do |data| %>
-                            <%= data['pid'] %>
+<div class="container">
+  <div class="row">
+    <div class="col-md-6">
+        <%# Year Select Bar %>
+        <%= form_tag request.path, method: "GET", style: 'none', class: 'w-100' do %>
+            <div class="row g-3 align-items-center">
+                <div class="col-auto">
+                    <%= select_tag :type, options_for_select(@collaborations['years'], @year), class: 'form-select' %> 
+                </div>
+                <div class="col-auto">
+                    <%= submit_tag "Select", class: 'btn btn-primary btn-submit' %>
+                </div>
+            </div>
+        <% end %>
+        
+        <ul>
+            <% @collaborations['data'].each do |year| %>
+                <li>
+                    <%= year[0] %>
+                    <br>
+                    <% year[1].each do |element| %>
+                        <% if element[1].is_a?(Hash) %>
+                            <%if element[1].keys.count > 1 %>
+                                <% element[1].each do |data| %>
+                                    <%= data['pid'] %>
+                                <% end %>
+                            <% else %>
+                                <a href="/authors/<%= ERB::Util.url_encode(element[1][element[1].keys[0]]['pid']) %>"><%= element[0] %></a>
+                            <% end %>
                         <% end %>
-                    <% else %>
-                        <a href="/authors/<%= ERB::Util.url_encode(element[1][element[1].keys[0]]['pid']) %>"><%= element[0] %></a>
+                        <br>
                     <% end %>
-                <% end %>
+                </li>
                 <br>
             <% end %>
-        </li>
-        <br>
-    <% end %>
-</ul>
-
-<div class="container">
-    <div class="row">
-        <div class="col-xs-6">
-            <div class="tab-content">
-                
-            </div>
-        </div>
-        <div class="col-xs-6">
-            <% if @collaborations['number'].length > 0 %>
-                <h3> Collaborazioni con autori: </h3>
-                <%= column_chart @collaborations['number'] %>
-            <% end %>
-        </div>
+        </ul>
     </div>
+
+    <div class="col-md-6">
+        <% if @collaborations['number'].length > 0 %>
+            <h3> Collaborazioni con autori: </h3>
+            <%= column_chart @collaborations['number'] %>
+        <% end %>
+    </div>
+  </div>
 </div>

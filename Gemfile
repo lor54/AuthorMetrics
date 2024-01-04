@@ -92,3 +92,6 @@ gem 'omniauth-rails_csrf_protection'
 gem 'figaro'
 gem 'open-uri'
 gem 'rails-controller-testing'
+
+gem 'will_paginate', '~> 4.0'
+gem 'will_paginate-bootstrap-style'
