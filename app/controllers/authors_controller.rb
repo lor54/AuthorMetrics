@@ -59,10 +59,6 @@ class AuthorsController < ApplicationController
 
     author = Author.getAuthor(@pid)
 
-    if @tab == 'collaborations'
-      loadColaborations(author)
-    end
-
     @author['name'] = author.name
     @author['orcid'] = author.orcid
     @author['orcidStatus'] = author.orcidStatus
@@ -90,47 +86,57 @@ class AuthorsController < ApplicationController
       @author['citations_counts_by_year'] = {}
     end
 
-    works = author.getWorks()
-    works.each do |work|
-      if !work.publication.nil?
-        pub = work.publication
-        otherAuthors = Work
-        .joins(:author)
-        .where(publication_id: pub.id)
-        .where.not(author_id: author.id)
-        .distinct
-        .pluck('authors.author_id', 'authors.name')
-        .map { |author_id, name| { 'pid' => author_id, '__content__' => name } }
-        atrr = pub.attributes
-        atrr['author'] = otherAuthors
+    if @tab == 'collaborations'
+      first = false
+      @collaborations = author.getCollaborations()
+  
+      @author['collaborations'] = {}
+      @collaborations['data'].each do |year, data|
+        if !first
+          @year = year
+          first = true
+        end
+        @author['collaborations'][year] ||= []
+  
+        data.each do |name, details|
+          @author['collaborations'][year] << { "name" => name, "pid" => details.keys[0] }
+        end
+  
+        @author['collaborations'][year] = @author['collaborations'][year].paginate(:page => params[:page], :per_page => 5)
       end
-    end
+    else
+      works = author.getWorks()
+      works.each do |work|
+        if !work.publication.nil?
+          pub = work.publication
+          otherAuthors = Work
+          .joins(:author)
+          .where(publication_id: pub.id)
+          .where.not(author_id: author.id)
+          .distinct
+          .pluck('authors.author_id', 'authors.name')
+          .map { |author_id, name| { 'pid' => author_id, '__content__' => name } }
+          atrr = pub.attributes
+          atrr['author'] = otherAuthors
+        end
+      end
 
-    if @type == 'all'
-      if title != ''
+      if @type == 'all'
+        if title != ''
+          @author['bibliography'] = Work.joins(:publication, :author)
+          .where("publications.title LIKE ?", "%#{title}%")
+          .where(authors: { author_id: author.author_id })
+          .paginate(page: params[:page], per_page: 10)
+        else
+          @author['bibliography'] = Work.joins(:publication).where(author_id: author.author_id).select('publications.*').paginate(:page => params[:page], :per_page => 10)
+        end
+      else
         @author['bibliography'] = Work.joins(:publication, :author)
         .where("publications.title LIKE ?", "%#{title}%")
         .where(authors: { author_id: author.author_id })
-        .paginate(page: params[:page], per_page: 9)
-      else
-        @author['bibliography'] = Work.joins(:publication).where(author_id: author.author_id).select('publications.*').paginate(:page => params[:page], :per_page => 9)
+        .where(publications: { articleType: @type })
+        .paginate(page: params[:page], per_page: 10)
       end
-    else
-      @author['bibliography'] = Work.joins(:publication, :author)
-      .where("publications.title LIKE ?", "%#{title}%")
-      .where(authors: { author_id: author.author_id })
-      .where(publications: { articleType: @type })
-      .paginate(page: params[:page], per_page: 9)
-    end
-  end
-
-  def loadColaborations(author)
-    @collaborations = author.getCollaborations()
-
-    @author['collaborations'] = []
-    @collaborations['data'].each do |year|
-      puts collaboration
-      sleep(5)
     end
   end
 end
