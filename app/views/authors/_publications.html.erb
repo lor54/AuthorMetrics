@@ -37,7 +37,7 @@
         <tbody>
             <% @author['bibliography'].each do |post| %>
             <tr>
-                <td><%= post.publication.title %></td>
+                <td><a href="/publications/<%= ERB::Util.url_encode(post.publication.publication_id) %>"><%= post.publication.title %></a></td>
                 <td><%= post.publication.articleType %></td>
                 <td><%= post.publication.year %></td>
             </tr>

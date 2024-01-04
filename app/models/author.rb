@@ -168,13 +168,19 @@ class Author < ApplicationRecord
             extraInformation['summary_stats'] = {}
             
             extraInformation = Author.getAuthorInformations(author['orcid'])
-            authorToUpdate = Author.find_by(author_id: pid)
-            authorToUpdate.update(h_index: extraInformation['summary_stats']['h_index'], citationNumber: extraInformation['cited_by_count'], last_known_institution: extraInformation['last_known_institution']['display_name'], last_known_institution_type: extraInformation['last_known_institution']['type'], last_known_institution_countrycode: extraInformation['last_known_institution']['country_code'], completed: true, updated_at: DateTime.now)
-            
-            extraInformation['counts_by_year'].each do |yearData|
-                cit = Citation.create(year: yearData['year'], citation_count: yearData['cited_by_count'], author: Author.find_by(author_id: pid), updated_at: DateTime.now)
+            if !extraInformation.nil?
+              authorToUpdate = Author.find_by(author_id: pid)
+              authorToUpdate.update(h_index: extraInformation['summary_stats']['h_index'])
+              authorToUpdate.update(citationNumber: extraInformation['cited_by_count'])
+              authorToUpdate.update(last_known_institution: extraInformation['last_known_institution']['display_name'])
+              authorToUpdate.update(last_known_institution_type: extraInformation['last_known_institution']['type'])
+              authorToUpdate.update(last_known_institution_countrycode: extraInformation['last_known_institution']['country_code'])
+              authorToUpdate.update(completed: true, updated_at: DateTime.now)
+              
+              extraInformation['counts_by_year'].each do |yearData|
+                  cit = Citation.create(year: yearData['year'], citation_count: yearData['cited_by_count'], author: Author.find_by(author_id: pid), updated_at: DateTime.now)
+              end
             end
-            
         end
     end
 
