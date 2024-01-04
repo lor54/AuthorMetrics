@@ -8,7 +8,7 @@ class Author < ApplicationRecord
         authordblp = HTTParty.get('https://dblp.org/search/author/api?q=' + name + '&h=' + maxPerPage.to_s + '&f=' + startValue.to_s + '&format=json')
         authordblp.parsed_response
     end
-    
+
     def self.getBibliography(pid)
         authordblp = HTTParty.get('https://dblp.org/pid/' + pid + '.xml')
         authordblp.parsed_response
@@ -23,7 +23,7 @@ class Author < ApplicationRecord
         createdAuthor = {}
         extraInformation = {}
         authorresponse = Author.getBibliography(pid)
-        
+
         author = {}
         author['counts_by_year'] = {}
         author['works_by_year'] = {}
@@ -32,7 +32,7 @@ class Author < ApplicationRecord
         author['bibliography_types'] = {}
         author['bibliography_types_peryear'] = []
         author['works_source'] = {}
-        
+
         author['orcid'] = ''
         author['orcidStatus'] = 'none'
         author['bibliography_types'] = {}
@@ -58,11 +58,11 @@ class Author < ApplicationRecord
             author['orcidStatus'] = 'verified'
           end
         end
-  
+
         author['name'] = authorresponse['dblpperson']['name']
         author['pid'] = pid
         bibliography = authorresponse['dblpperson']['r']
-  
+
         author['bibliography'] = {}
         if bibliography.is_a?(Hash)
           bibliography = [bibliography]
@@ -73,21 +73,21 @@ class Author < ApplicationRecord
             elementType = element.keys[0]
             element = element[element.keys[0]]
             element['type'] = elementType
-  
+
             if !author['bibliography'].key?(element['year'])
               author['bibliography'][element['year']] = []
             end
-  
+
             if element['author']
               element['author'].collect{ |author|
                 if author.is_a?(Array)
                   if author[0] == '__content__'
                     auth = [{'__content__' => author[1]}]
-  
+
                     if author[2] == 'pid'
                       auth[0]['pid'] = author[3]
                     end
-  
+
                     element['author'] = auth
                   end
                 end
@@ -97,11 +97,11 @@ class Author < ApplicationRecord
                 if author.is_a?(Array)
                   if author[0] == '__content__'
                     auth = [{'__content__' => author[1]}]
-  
+
                     if author[2] == 'pid'
                       auth[0]['pid'] = author[3]
                     end
-  
+
                     element['author'] = auth
                   end
                 else
@@ -109,7 +109,7 @@ class Author < ApplicationRecord
                 end
               }
             end
-  
+
             if author['orcid'].empty?
               if element['author'].is_a?(Array)
                 element['author'].each do |pubAuthor|
@@ -133,7 +133,7 @@ class Author < ApplicationRecord
               authorToUpdate = Author.find_by(author_id: pid)
               authorToUpdate.update(author_id: pid, name: author['name'], surname: '', orcid: author['orcid'], orcidStatus: author['orcidStatus'], works_count: author['works_count'], completed: true, updated_at: DateTime.now)
             end
-  
+
             url = ''
             if element['ee'].is_a?(Hash) && element['ee']['__content__']
               url = element['ee']['__content__']
@@ -142,9 +142,9 @@ class Author < ApplicationRecord
             elsif element['ee'].is_a?(Array)
               url = element['ee'][0]
             end
-            
+
             if(!Publication.exists?(publication_id: element['key']))
-              pub = Publication.create(publication_id: element['key'], year: element['year'], title: element['title'], url: url, releasedate: element['mdate'], articleType: element['type'], updated_at: DateTime.now)
+              pub = Publication.create(publication_id: element['key'], title: element['title'], url: url, releaseDate: element['mdate'], articleType: element['type'], updated_at: DateTime.now)
             end
             Work.create(publication: Publication.find_by(publication_id: element['key']), author: Author.find_by(author_id: pid))
 
@@ -166,15 +166,15 @@ class Author < ApplicationRecord
             extraInformation = {}
             extraInformation['last_known_institution'] = {}
             extraInformation['summary_stats'] = {}
-            
+
             extraInformation = Author.getAuthorInformations(author['orcid'])
             authorToUpdate = Author.find_by(author_id: pid)
             authorToUpdate.update(h_index: extraInformation['summary_stats']['h_index'], citationNumber: extraInformation['cited_by_count'], last_known_institution: extraInformation['last_known_institution']['display_name'], last_known_institution_type: extraInformation['last_known_institution']['type'], last_known_institution_countrycode: extraInformation['last_known_institution']['country_code'], completed: true, updated_at: DateTime.now)
-            
+
             extraInformation['counts_by_year'].each do |yearData|
                 cit = Citation.create(year: yearData['year'], citation_count: yearData['cited_by_count'], author: Author.find_by(author_id: pid), updated_at: DateTime.now)
             end
-            
+
         end
     end
 
@@ -258,9 +258,9 @@ class Author < ApplicationRecord
 
         distinct_types = Publication.distinct.pluck(:articleType)
         distinct_years = Publication.distinct.pluck(:year)
-      
+
         all_combinations = distinct_types.product(distinct_years)
-      
+
         all_combinations.each do |combination|
           bibliography_types_peryear[combination] = 0
         end
@@ -269,7 +269,7 @@ class Author < ApplicationRecord
         publications.each do |publication|
           year = publication.year
           article_type = publication.articleType
-      
+
           key = [article_type, year]
           bibliography_types_peryear[key] += 1
         end
@@ -288,16 +288,16 @@ class Author < ApplicationRecord
             collaborations['years'].push(year)
           end
           collaborations['data'][year] ||= {}
-        
+
           Work.where(publication_id: work.publication_id).each do |work2|
             content_key = work2.author.name
             pid_key = work2.author.author_id
-        
+
             next if content_key == name && (pid_key == author_id || pid_key.nil?)
-        
+
             collaborations['data'][year][content_key] ||= {}
             collaborations['data'][year][content_key][pid_key] ||= { 'pid' => pid_key, 'count' => 0 }
-        
+
             collaborations['data'][year][content_key][pid_key]['count'] += 1
           end
         end

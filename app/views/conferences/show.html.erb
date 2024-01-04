@@ -1,12 +1,27 @@
+<%= javascript_include_tag 'script' %>
+
+<button class="press" type="button">test</button>
 <div>
    <h1><%= @information['name']%></h1>
    <div>
       <h3>Papers of the conference</h3>
       <% @information['publications'].each do |info|%>
-         <div><%= info.title%></div>
-         <div><%= link_to "read paper", info.url %></div>
-         <div><%= info.releaseDate%></div>
-         <div>-------------------</div>
-      <%end %>
+         <div class= <%= info.releaseDate%>>
+            <div><%= info.title%></div>
+            <div>
+               <% if info.url == '' || info.url == nil%>
+                  [Not Available]
+               <% else %>
+                  <%= link_to "read paper", info.url, class: 'hide', data:{'js-hide-link' => true} %>
+               <% end %>
+            </div>
+            <div><%= info.releaseDate%></div>
+            <div>-------------------</div>
+         </div>
+      <% end %>
+      <h3>Authors of the conference </h3>
+      <% @information['authors'].each do |author|%>
+         <div><%= author%></div>
+      <% end %>
    </div>
 </div>

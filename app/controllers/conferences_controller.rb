@@ -61,12 +61,13 @@ class ConferencesController < ApplicationController
             publication = Publication.update(:conference_id => conference.conference_id)
           end
         end
-        #if !(entry[1]['authors'].empty?)
-        #  entry[1]['authors'].each do |author|
-        #    #dovrebbe salvare gli autori nel database da vedere se lo fa
-        #    Author.getAuthorData(author)
-        #  end
-        #end
+        if !(entry[1]['authors'].empty?)
+          entry[1]['authors'].each do |author|
+            #dovrebbe salvare gli autori nel database da vedere se lo fa
+            author = Author.getAuthorData(author)
+            p author
+          end
+        end
       end
     #check if the conference information has been in the last week, if so skip the update and query the database for the information
     elsif !(Conference.select(:updated_at).where(:conference_id=> conferenceId).first.updated_at <= DateTime.now.utc.end_of_day() - 7)

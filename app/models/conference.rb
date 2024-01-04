@@ -14,12 +14,14 @@ class Conference < ApplicationRecord
     elemNumber = 0
     until completed
       publicationInfoDblp = HTTParty.get('https://dblp.org/search/publ/api?q=stream:streams/conf/' + confId + ':&h=' + numberElements.to_s + '&f=' + starting.to_s + '&format=json').parsed_response
-      #########################################################################
-      # this doesn't work, because if they send 0 they put status code 200 OK #
-      #if publicationInfoDblp['result']['status']['@code'].to_i != 200        #
-      #  return 'There has been an error'                                     #
-      #end                                                                    #
-      #########################################################################
+
+      #################################################################################//
+      # this doesn't work, because if they send 0 records they put status code 200 OK #
+      #if publicationInfoDblp['result']['status']['@code'].to_i != 200                #
+      #  return 'There has been an error'                                             #
+      #end                                                                            #
+      #################################################################################
+
       #check for correct answer from the API call, if the sent are 0 we return the results
       if publicationInfoDblp['result']['hits']['@sent'].to_i == 0
         return results
@@ -47,7 +49,7 @@ class Conference < ApplicationRecord
         completed = true
       else
         #get the next thousand records
-        starting += numberElement
+        starting += numberElements
         numberElement = 1000
       end
     end
@@ -61,9 +63,16 @@ class Conference < ApplicationRecord
 
   def self.getConferenceDatabase(conferenceId)
     information = Hash.new()
+    authorsList = Array.new()
     conference = Conference.where(:conference_id => conferenceId)[0]
     information['publications'] = conference.publications
+    conference.publications.each do |publication|
+      publication.authors.each do |author|
+          authorsList.push(author.name)
+      end
+    end
     information['name'] = conference.name
+    information['authors'] = authorsList
     return information
   end
 end
