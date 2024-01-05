@@ -25,7 +25,7 @@ class Author < ApplicationRecord
     author = {}
 
     urls = authorresponse['dblpperson']['person']['url']
-    if !url.nil? && urls.present?
+    if !urls.nil? && urls.present?
       if urls.is_a?(Array)
         authorresponse['dblpperson']['person']['url'].each do |url|
           if url.include? 'orcid'
@@ -73,7 +73,7 @@ class Author < ApplicationRecord
       author['bibliography_types_peryear'] = []
 
       urls = authorresponse['dblpperson']['person']['url']
-      if !url.nil? && urls.present?
+      if !urls.nil? && urls.present?
         if urls.is_a?(Array)
           authorresponse['dblpperson']['person']['url'].each do |url|
             if url.include? 'orcid'
@@ -157,10 +157,10 @@ class Author < ApplicationRecord
           end
 
           if !Author.exists?(author_id: pid)
-            createdAuthor = Author.create(author_id: pid, name: author['name'], surname: '', orcid: author['orcid'], orcidStatus: author['orcidStatus'], works_count: author['works_count'], completed: true, updated_at: DateTime.now)
+            createdAuthor = Author.create(author_id: pid, name: author['name'], orcid: author['orcid'], orcidStatus: author['orcidStatus'], works_count: author['works_count'], completed: true, updated_at: DateTime.now)
           elsif Author.find_by(author_id: pid).completed == false
             authorToUpdate = Author.find_by(author_id: pid)
-            authorToUpdate.update(author_id: pid, name: author['name'], surname: '', orcid: author['orcid'], orcidStatus: author['orcidStatus'], works_count: author['works_count'], completed: true, updated_at: DateTime.now)
+            authorToUpdate.update(author_id: pid, name: author['name'], orcid: author['orcid'], orcidStatus: author['orcidStatus'], works_count: author['works_count'], completed: true, updated_at: DateTime.now)
           end
 
           url = ''
