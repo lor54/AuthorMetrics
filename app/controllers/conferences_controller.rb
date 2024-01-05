@@ -64,7 +64,7 @@ class ConferencesController < ApplicationController
         if !(entry[1]['authors'].empty?)
           entry[1]['authors'].each do |author|
             #dovrebbe salvare gli autori nel database da vedere se lo fa
-            author = Author.getAuthorData(author)
+            author = Author.createAutor(author)
             p author
           end
         end

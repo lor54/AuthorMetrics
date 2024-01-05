@@ -3,7 +3,6 @@ class CreateAuthors < ActiveRecord::Migration[7.0]
     create_table :authors do |t|
       t.integer :author_id, unique: true, foreign_key: true
       t.string :name
-      t.string :surname
       t.string :orcid
       t.string :orcidStatus
       t.float :h_index

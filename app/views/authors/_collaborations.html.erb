@@ -8,7 +8,7 @@
                     <label class="col-form-label">Year</label>
                 </div>
                 <div class="col-auto">
-                    <%= select_tag :type, options_for_select(@collaborations['years'], @year), class: 'form-select' %> 
+                    <%= select_tag :year, options_for_select(@collaborations['years'], @year), class: 'form-select' %> 
                 </div>
                 <div class="col-auto">
                     <%= submit_tag "Select", class: 'btn btn-primary btn-submit' %>

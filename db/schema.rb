@@ -42,7 +42,6 @@ ActiveRecord::Schema[7.0].define(version: 2024_01_03_112944) do
   create_table "authors", force: :cascade do |t|
     t.integer "author_id"
     t.string "name"
-    t.string "surname"
     t.string "orcid"
     t.string "orcidStatus"
     t.float "h_index"
@@ -79,16 +78,18 @@ ActiveRecord::Schema[7.0].define(version: 2024_01_03_112944) do
     t.index ["user_id"], name: "index_follows_on_user_id"
   end
 
-  create_table "publications", force: :cascade do |t|
-    t.string "publication_id"
+  create_table "publications", id: false, force: :cascade do |t|
+    t.string "publication_id", null: false
+    t.integer "year"
     t.string "title"
     t.string "url"
     t.string "articleType"
-    t.integer "releaseDate"
+    t.date "releaseDate"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.integer "conference_id"
     t.index ["conference_id"], name: "index_publications_on_conference_id"
+    t.index ["publication_id"], name: "index_publications_on_publication_id", unique: true
   end
 
   create_table "users", force: :cascade do |t|
