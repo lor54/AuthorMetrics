@@ -92,6 +92,7 @@ class AuthorsController < ApplicationController
   
       @author['collaborations'] = {}
       @collaborations['data'].each do |year, data|
+        year = year.to_s
         if !first
           @year = year
           first = true
@@ -103,6 +104,11 @@ class AuthorsController < ApplicationController
         end
   
         @author['collaborations'][year] = @author['collaborations'][year].paginate(:page => params[:page], :per_page => 5)
+      end
+
+      if !params[:year].nil?
+        year = params[:year]
+        @year = year
       end
     else
       works = author.getWorks()
