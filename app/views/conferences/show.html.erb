@@ -1,27 +1,32 @@
-<%= javascript_include_tag 'script' %>
-
-<button class="press" type="button">test</button>
 <div>
-   <h1><%= @information['name']%></h1>
+   <h1><%= @conference['name']%></h1>
    <div>
       <h3>Papers of the conference</h3>
-      <% @information['publications'].each do |info|%>
-         <div class= <%= info.releaseDate%>>
-            <div><%= info.title%></div>
-            <div>
-               <% if info.url == '' || info.url == nil%>
-                  [Not Available]
-               <% else %>
-                  <%= link_to "read paper", info.url, class: 'hide', data:{'js-hide-link' => true} %>
-               <% end %>
-            </div>
-            <div><%= info.releaseDate%></div>
-            <div>-------------------</div>
-         </div>
-      <% end %>
+      <table class="table table-striped table-bordered">
+        <thead>
+            <tr>
+            <th scope="col">Title</th>
+            <th scope="col">Type</th>
+            <th scope="col">Year</th>
+            </tr>
+        </thead>
+        <tbody>
+            <% @conference['publications'].each do |publ| %>
+            <tr>
+                <td><a href="/publications/<%= ERB::Util.url_encode(publ.publication_id) %>"><%= publ.title %></a></td>
+                <td><%= publ.articleType %></td>
+                <td><%= publ.year %></td>
+            </tr>
+            <% end %>
+        </tbody>
+    </table>
+
+      <%= will_paginate @conference['publications'],:param_name=> 'publ_page', renderer: WillPaginate::ActionView::BootstrapLinkRenderer %>
+      </div>
       <h3>Authors of the conference </h3>
-      <% @information['authors'].each do |author|%>
-         <div><%= author%></div>
+      <% @conference['authors'].each do |author|%>
+         <div><%= link_to author%></div>
       <% end %>
+      <%= will_paginate @conference['authors'],:param_name=> 'author_page', renderer: WillPaginate::ActionView::BootstrapLinkRenderer %>
    </div>
 </div>

@@ -44,38 +44,57 @@ class ConferencesController < ApplicationController
   end
 
   def show
-    conferenceId = params[:id]
-    # check of existence in the database, if it doesn't insert the information in the database
-    if !(Conference.where(:conference_id => conferenceId).exists?)
-      #if not existing process information and add the conference papers and authors
-      information = Conference.getConferenceInformation(conferenceId)
-      conferenceVenue = HTTParty.get("https://dblp.org/db/conf/"+ conferenceId +"/index.xml").parsed_response['bht']['h1']
-      conference = Conference.create(conference_id: conferenceId, name: conferenceVenue)
-      information.each do |entry|
-        #if th publication doesn't exist in the database we insert it and use it for the paper information
-        if !(Publication.where(:publication_id => entry[1]['key']).exists?)
-          publication = conference.publications.create(publication_id: entry[1]['key'], title: entry[1]['title'], articleType: entry[1]['type'] , url: entry[1]['url'], releaseDate: entry[1]['year'], conference_id: conference.conference_id)
-        else
-          publication = Publication.where(:publication_id => entry[1]['key'])
-          if(publication.conference_id.is_nil?)
-            publication = Publication.update(:conference_id => conference.conference_id)
-          end
-        end
-        if !(entry[1]['authors'].empty?)
-          entry[1]['authors'].each do |author|
-            #dovrebbe salvare gli autori nel database da vedere se lo fa
-            author = Author.createAutor(author)
-            p author
-          end
+
+    @types = [ 'all', 'article', 'inproceedings', 'proceedings', 'book', 'incollection' ]
+    conferenceId = params[:id] || 0
+    title = params[:title] || ''
+    @type = params[:type] || 'all'
+    if !@types.include? (@type)
+      @type = 'all'
+    end
+
+    #we extract the information from the database
+    conference = Conference.getConferenceDatabase(conferenceId)
+
+    @conference = Hash.new()
+    @conference['name'] = conference.name
+
+    authorsList = Array.new()
+    years = Array.new()
+
+    conference.publications.each do |publication|
+      publication.authors.each do |author|
+        if !(authorsList.include?(author.name))
+          authorsList.push(author.name)
         end
       end
-    #check if the conference information has been in the last week, if so skip the update and query the database for the information
-    elsif !(Conference.select(:updated_at).where(:conference_id=> conferenceId).first.updated_at <= DateTime.now.utc.end_of_day() - 7)
-      information = Conference.getConferenceInformation(conferenceId)
-      #implement update of the conference informations
+      if !(years.include?(publication.year))
+        years.push(publication.year)
+      end
     end
-    #we extract the information from the database
-    @information = Conference.getConferenceDatabase(conferenceId)
-  end
+    @conference['years'] = years
+    @conference['authors'] = authorsList.paginate(page: params[:author_page], per_page: 20)
 
+    if @type = 'all'
+      if title != ''
+        @conference['publications'] = conference.publications
+        .where("publications.title Like ?", "%#{title}%")
+        .paginate(page: params[:page], per_page: 10)
+      else
+        @conference['publications'] = conference.publications.paginate(page: params[:publ_page], per_page: 10)
+      end
+    else
+      if title != ''
+        @conference['publications'] = conference.publications
+        .where("publications.title Like ?", "%#{title}%")
+        .where(publications: {article_type: @type})
+        .paginate(page: params[:page], per_page: 10)
+      else
+        @conference['publications'] = conference.publications
+        .where(publications: {article_type: @type})
+        .paginate(page: params[:page], per_page: 10)
+      end
+    end
+    p @conference['publications']
+  end
 end
