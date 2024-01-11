@@ -4,9 +4,15 @@
     <%= image_tag(current_user.avatar_thumbnail, class:'me-4') %>
     <ul class="m-2 fs-5">
         <li><strong>Email:</strong> <%= current_user.email %></li>
-        <li><strong>Nome:</strong> <%= current_user.name %></li>
-        <li><strong>Cognome:</strong> <%= current_user.surname %></li>
-        <li><strong>Username:</strong> <%= current_user.username %></li>
+        <% if !current_user.name.nil? %>
+            <li><strong>Nome:</strong> <%= current_user.name %></li>
+        <% end %>
+        <% if !current_user.surname.nil? %>
+            <li><strong>Cognome:</strong> <%= current_user.surname %></li>
+        <% end %>
+        <% if !current_user.username.nil? %>
+            <li><strong>Username:</strong> <%= current_user.username %></li>
+        <% end %>
         <li><strong><%= link_to "Autori Seguiti:", author_followed_path, data: { turbo_frame: "followed_authors_frame" }, remote: true %></strong>
             <%= current_user.follows.count %>
         </li>

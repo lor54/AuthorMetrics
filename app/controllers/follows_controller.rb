@@ -10,10 +10,10 @@ class FollowsController < ApplicationController
         else
             follow = Follow.where(user: current_user, author: author).first
             if !follow.nil?
-                flash[:alert] = "You are already following this author"
+                flash[:alert] = "You are already following " + author.name
             else
                 follow = Follow.create(user: current_user, author: author)
-                flash.now[:notice] = "Successfully followed the author"
+                flash[:notice] = "Successfully followed " + author.name
             end
             redirect_to author_path(params[:author_id])
         end
@@ -24,7 +24,7 @@ class FollowsController < ApplicationController
         author = follow.author
         follow.destroy
         id = author.author_id
-        flash[:notice] = "Successfully unfollowed the author"
+        flash[:notice] = "Successfully unfollowed " + author.name
         redirect_to author_path(id)
     end
 
