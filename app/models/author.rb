@@ -20,7 +20,6 @@ class Author < ApplicationRecord
   end
 
   def self.createAutor(pid)
-    p pid
     authorresponse = Author.getBibliography(pid)
     author = {}
 
@@ -180,7 +179,6 @@ class Author < ApplicationRecord
           element['author'].each do |pubAuthor|
               if pubAuthor.is_a?(Hash)
                   if pubAuthor['pid'].present? && pubAuthor['pid'] != pid
-                      p pubAuthor
                       if !Author.exists?(author_id: pubAuthor['pid'])
                           Author.create(author_id: pubAuthor['pid'], name: pubAuthor['__content__'], completed: false)
                           Work.create(publication: Publication.find_by(publication_id: element['key']), author: Author.find_by(author_id: pubAuthor['pid']))

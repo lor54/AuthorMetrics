@@ -55,7 +55,7 @@
             <tbody>
                 <% @publication['citations'][@citationYear].each do |citation| %>
                 <tr>
-                    <td><a href="/authors/<%= ERB::Util.url_encode(citation['pid']) %>"><%= citation['title'] %></a></td>
+                    <td><a href="<%= citation['url'] %>"><%= citation['title'] %></a></td>
                 </tr>
                 <% end %>
             </tbody>
@@ -75,7 +75,7 @@
                         <label class="col-form-label">Year</label>
                     </div>
                     <div class="col-auto">
-                        <%= select_tag :year, options_for_select(@referencesYears, @referenceYear), class: 'form-select' %> 
+                        <%= select_tag :referenceYear, options_for_select(@referencesYears, @referenceYear), class: 'form-select' %> 
                     </div>
                     <div class="col-auto">
                         <%= submit_tag "Select", class: 'btn btn-primary btn-submit' %>
@@ -93,7 +93,7 @@
                 <tbody>
                     <% @publication['references'][@referenceYear].each do |reference| %>
                     <tr>
-                        <td><a href="/authors/<%= ERB::Util.url_encode(reference['pid']) %>"><%= reference['title'] %></a></td>
+                        <td><a href="<%= reference['url'] %>"><%= reference['title'] %></a></td>
                     </tr>
                     <% end %>
                 </tbody>
