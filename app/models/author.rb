@@ -173,7 +173,7 @@ class Author < ApplicationRecord
           end
           
           if(!Publication.exists?(publication_id: element['key']))
-            pub = Publication.create(publication_id: element['key'], year: element['year'], title: element['title'], url: url, releaseDate: element['mdate'], articleType: element['type'], updated_at: DateTime.now)
+            pub = Publication.create(publication_id: element['key'], year: element['year'], title: element['title'], url: url, releaseDate: element['mdate'], articleType: element['type'], completed: false, updated_at: DateTime.now)
           end
           Work.create(publication: Publication.find_by(publication_id: element['key']), author: Author.find_by(author_id: pid))
 

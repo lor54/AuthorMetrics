@@ -40,7 +40,7 @@ ActiveRecord::Schema[7.0].define(version: 2024_01_03_112944) do
   end
 
   create_table "authors", force: :cascade do |t|
-    t.integer "author_id"
+    t.string "author_id"
     t.string "name"
     t.string "orcid"
     t.string "orcidStatus"
@@ -80,11 +80,14 @@ ActiveRecord::Schema[7.0].define(version: 2024_01_03_112944) do
 
   create_table "publications", id: false, force: :cascade do |t|
     t.string "publication_id", null: false
+    t.string "doi"
     t.integer "year"
     t.string "title"
+    t.string "pubType"
     t.string "url"
     t.string "articleType"
     t.date "releaseDate"
+    t.boolean "completed"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.integer "conference_id"

@@ -1,7 +1,7 @@
 class CreateAuthors < ActiveRecord::Migration[7.0]
   def change
     create_table :authors do |t|
-      t.integer :author_id, unique: true, foreign_key: true
+      t.string :author_id, unique: true, foreign_key: true
       t.string :name
       t.string :orcid
       t.string :orcidStatus

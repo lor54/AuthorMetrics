@@ -3,43 +3,36 @@ require 'httparty'
 class PublicationsController < ApplicationController
     def index
         key = params[:key] || 0
-        publicationData = Publication.getPublicationInformation(key)
-        publicationData = publicationData['dblp']
+        @publication = Publication.getPublicationInformation(key)
+        
+        @referencesYears = []
+        @referenceYear = 0
+        if !@publication['references'].nil?
+            @referencesYears = @publication['references'].keys
+            @referenceYear = @referencesYears[0]
 
-
-        @publication = {}
-        @publication['doi'] = ""
-        @publication['references'] = []
-        @publication['citations'] = []
-
-        if publicationData.is_a?(Hash)
-            @publication['type'] = publicationData.keys[0]
-            @publication['data'] = publicationData[@publication['type']]
-
-            if @publication['data']['ee'].is_a? (Hash)
-                if @publication['data']['ee']['__content__'].include? "https://doi.org/"
-                    doi = @publication['data']['ee']['__content__']
-                    doi.slice! "https://doi.org/"
-                    @publication['doi'] = doi
-
-                    @publication['references'] = getPublicationCitRef(doi)['references']
-                    @publication['citations'] = getPublicationCitRef(doi)['citations']
-                end
-            elsif @publication['data']['ee'].is_a? (String)
-                doi = @publication['data']['ee']
-                doi.slice! "https://doi.org/"
-                @publication['doi'] = doi
-
-                @publication['references'] = getPublicationCitRef(doi)['references']
-                @publication['citations'] = getPublicationCitRef(doi)['citations']
+            @publication['references'].each do |year, references|
+                @publication['references'][year] = @publication['references'][year].paginate(:page => params[:referencesPage], :per_page => 5)
             end
+        end
 
-            @publication['citationsNum_peryear'] = {}
+        @citationsYears = []
+        @citationYear = 0
+        if !@publication['citations'].nil?
+            @citationsYears = @publication['citations'].keys
+            @citationYear = @citationsYears[0]
+
             @publication['citations'].each do |year, citations|
-                @publication['citationsNum_peryear'][year] = citations.length
+                @publication['citations'][year] = @publication['citations'][year].paginate(:page => params[:citationsPage], :per_page => 5)
             end
+        end
 
-            @publication['citationsNum_peryear'] = @publication['citationsNum_peryear'].sort.to_h
+        if !params[:citationYear].nil?
+            @citationYear = params[:citationYear].to_i
+        end
+
+        if !params[:referenceYear].nil?
+            @referenceYear = params[:referenceYear].to_i
         end
     end
 
