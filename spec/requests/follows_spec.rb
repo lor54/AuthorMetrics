@@ -13,7 +13,7 @@ RSpec.describe FollowsController, type: :request do
       follow = Follow.last
       expect(follow.user).to eq(user)
       expect(follow.author).to eq(author)
-      expect(flash[:notice]).to eq("Successfully followed the author")
+      expect(flash[:notice]).to eq("Successfully followed " + author.name)
     end
 
     it 'requires authentication to create a follow relationship' do
@@ -34,7 +34,7 @@ RSpec.describe FollowsController, type: :request do
     
       post author_follows_path(author)
       expect(response).to redirect_to(author_path(author))
-      expect(flash[:alert]).to eq('You are already following this author')
+      expect(flash[:alert]).to eq('You are already following ' + author.name)
     end
     
   end

@@ -1,5 +1,3 @@
-# features/step_definitions/follows_steps.rb
-
     Given('there is a user signed in') do
         @user = FactoryBot.create(:user)
         visit new_user_session_path
