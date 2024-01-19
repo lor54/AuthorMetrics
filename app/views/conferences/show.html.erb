@@ -1,51 +1,61 @@
 <div>
    <h1><%= @conference['name']%></h1>
-   <div>
-      <h3>Papers of the conference</h3>
-      <%= form_tag request.path, method: "GET", style: 'none', class: 'w-100' do %>
-        <div class="row g-3 align-items-center">
-            <div class="col-auto">
-                <label class="col-form-label">Title</label>
-            </div>
-            <div class="col-auto">
-                <%= text_field_tag :title, params[:title], class: 'form-control', placeholder: 'Title' %>
-            </div>
-            <div class="col-auto">
-                <label class="col-form-label">Year</label>
-            </div>
-            <div class="col-auto">
-                <%= select_tag :year, options_for_select(@years, @year), class: 'form-select'%>
-            </div>
-            <div class="col-auto">
-                <%= submit_tag "Search", class: 'btn btn-primary btn-submit' %>
-            </div>
-        </div>
-      <% end %>
-      <table class="table table-striped table-bordered">
-        <thead>
-            <tr>
-            <th scope="col">Title</th>
-            <th scope="col">Type</th>
-            <th scope="col">Year</th>
-            </tr>
-        </thead>
-        <tbody>
-            <% @conference['publications'].each do |publ| %>
-            <tr>
-                <td><a href="<%=publ.url%>"><%= publ.title %></a></td>
-                <td><%= publ.articleType %></td>
-                <td><%= publ.year %></td>
-            </tr>
+    <%= turbo_frame_tag id="publications" do %>
+        <div>
+            <h3>Papers of the conference</h3>
+            <%= form_tag request.path, method: "GET", style: 'none', class: 'w-100' do %>
+                <div class="row g-3 align-items-center">
+                    <div class="col-auto">
+                        <label class="col-form-label">Title</label>
+                    </div>
+                    <div class="col-auto">
+                        <%= text_field_tag :title, params[:title], class: 'form-control', placeholder: 'Title' %>
+                    </div>
+                    <div class="col-auto">
+                        <label class="col-form-label">Year</label>
+                    </div>
+                    <div class="col-auto">
+                        <%= select_tag :year, options_for_select(@years, @year), class: 'form-select'%>
+                    </div>
+                    <div class="col-auto">
+                        <%= submit_tag "Search", class: 'btn btn-primary btn-submit' %>
+                    </div>
+                </div>
             <% end %>
-        </tbody>
-    </table>
+            <table class="table table-striped table-bordered">
+                <thead>
+                    <tr>
+                    <th scope="col">Title</th>
+                    <th scope="col">Type</th>
+                    <th scope="col">Year</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <% @conference['publications'].each do |publ| %>
+                    <tr>
+                        <td><a href="<%=publ.url%>" , data: { turbo: false }><%= publ.title %></a></td>
+                        <td><%= publ.articleType %></td>
+                        <td><%= publ.year %></td>
+                    </tr>
+                    <% end %>
+                </tbody>
+            </table>
 
-      <%= will_paginate @conference['publications'],:param_name=> 'publ_page', renderer: WillPaginate::ActionView::BootstrapLinkRenderer %>
-      </div>
+            <%= will_paginate @conference['publications'],:param_name=> 'publ_page', renderer: WillPaginate::ActionView::BootstrapLinkRenderer %>
+        </div>
+    <% end %>
+    <%= turbo_frame_tag id="authors" do %>
       <h3>Authors of the conference </h3>
       <% @conference['authors'].each do |author|%>
-         <div><%= link_to author%></div>
+         <div><%= link_to author.values[0], author_path(author.keys[0]) , data: { turbo: false }%></div>
       <% end %>
       <%= will_paginate @conference['authors'],:param_name=> 'author_page', renderer: WillPaginate::ActionView::BootstrapLinkRenderer %>
    </div>
+   <div>
+        <% if @conference['publications'].group(:year).length > 0 %>
+                <h6> Numero di pubblicazioni per anno: </h6>
+                <%= column_chart @conference['publications'].group(:year).count %>
+        <% end %>
+    <% end %>
+    </div>
 </div>

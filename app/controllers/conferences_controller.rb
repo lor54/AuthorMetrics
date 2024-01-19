@@ -56,12 +56,12 @@ class ConferencesController < ApplicationController
     @conference['name'] = conference.name
 
     authorsList = Array.new()
-
-
     conference.publications.each do |publication|
       publication.authors.each do |author|
         if !(authorsList.include?(author.name))
-          authorsList.push(author.name)
+          authorInfo = Hash.new()
+          authorInfo[author.author_id] = author.name
+          authorsList.push(authorInfo)
         end
       end
       if !(@years.include?(publication.year))
