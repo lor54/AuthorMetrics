@@ -1,8 +1,8 @@
-Given('the user follows the author') do
-    @follow = FactoryBot.create(:follow, user: @user, author: @author)
-end
+# Given('the user follows the author') do
+#     @follow = FactoryBot.create(:follow, user: @user, author: @author)
+# end
 
-When('the user visits the user page') do
+And('the user visits the user page') do
     visit user_path(@user.id)
 end
 
