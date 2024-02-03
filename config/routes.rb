@@ -24,7 +24,7 @@ Rails.application.routes.draw do
     resources :follows, path: 'author_follows' , only: [:create]
   end
   get "/authors/:id/:tab", to: "authors#show"
-  get "/publications/:key", to: "publications#index"
+  get "/publications/:key", to: "publications#index", as: :publication
 
   get '/faq', to: 'faq#index'
   get '/faq/:subfolder/:file_name', to: 'faq#show', as: :show_faq
