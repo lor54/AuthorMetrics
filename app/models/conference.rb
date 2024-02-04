@@ -7,21 +7,12 @@ class Conference < ApplicationRecord
 
   def self.getConferenceInformation(confId)
     starting = 0;
-    # we ask for 10k elements as first request (most conferences will give all of their information within this first request)
-    numberElements = 10000
+    numberElements = 1000
     completed = false
     results = Hash.new()
     elemNumber = 0
     until completed
       publicationInfoDblp = HTTParty.get('https://dblp.org/search/publ/api?q=stream:streams/conf/' + confId + ':&h=' + numberElements.to_s + '&f=' + starting.to_s + '&format=json').parsed_response
-
-      #################################################################################
-      # this doesn't work, because if they send 0 records they put status code 200 OK #
-      #if publicationInfoDblp['result']['status']['@code'].to_i != 200                #
-      #  return 'There has been an error'                                             #
-      #end                                                                            #
-      #################################################################################
-      #check for correct answer from the API call, if the sent are 0 we return the results
       if publicationInfoDblp['result']['hits']['@sent'].to_i == 0
         return results
       end
@@ -49,7 +40,6 @@ class Conference < ApplicationRecord
       else
         #get the next thousand records
         starting += numberElements
-        numberElement = 1000
       end
     end
     return results

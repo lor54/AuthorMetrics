@@ -1,8 +1,9 @@
 class Publication < ApplicationRecord
     self.primary_key = :publication_id
-    has_many :works
+    has_many :works, foreign_key: :publication_id, primary_key: :publication_id
     has_many :authors, through: :works
     belongs_to :conference, foreign_key: "conference_id", optional: true
+
 
     def self.getPublicationInformation(key)
         completed = true
@@ -11,7 +12,7 @@ class Publication < ApplicationRecord
                 completed = false
             end
         end
-        
+
         if !Publication.exists?(key) || !completed
             publicationdblp = HTTParty.get('https://dblp.org/rec/' + key + '.xml')
             publicationData = publicationdblp.parsed_response
@@ -121,7 +122,7 @@ class Publication < ApplicationRecord
             referencesResult[reference['year']].append(ref)
         end
         referencesResult.keys.sort
-        
+
         result = {}
         result['citations'] = citationsResult
         result['references'] = referencesResult

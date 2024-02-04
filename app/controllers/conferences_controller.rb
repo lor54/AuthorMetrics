@@ -56,6 +56,7 @@ class ConferencesController < ApplicationController
     @conference['name'] = conference.name
 
     authorsList = Array.new()
+=begin
     conference.publications.each do |publication|
       publication.authors.each do |author|
         if !(authorsList.include?(author.name))
@@ -67,6 +68,17 @@ class ConferencesController < ApplicationController
       if !(@years.include?(publication.year))
         @years.push(publication.year)
       end
+    end
+    # test di query singole per vedere se sono più veloci
+=end
+    conference.publications.select(:year).distinct.each do |value|
+      @years.push(value.year)
+    end
+    authors = Author.joins(works: :publication).where('publication.publication_id' => conference.publication_ids).distinct
+    authors.each do |author|
+      authorInfo = Hash.new()
+      authorInfo[author.author_id] = author.name
+      authorsList.push(authorInfo)
     end
     @conference['years'] = @years
     @conference['authors'] = authorsList.paginate(page: params[:author_page], per_page: 20)
