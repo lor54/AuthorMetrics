@@ -157,9 +157,10 @@ class Author < ApplicationRecord
 
           if !Author.exists?(author_id: pid)
             createdAuthor = Author.create(author_id: pid, name: author['name'], orcid: author['orcid'], orcidStatus: author['orcidStatus'], works_count: author['works_count'], completed: true, updated_at: DateTime.now)
-          elsif Author.find_by(author_id: pid).completed == false
-            authorToUpdate = Author.find_by(author_id: pid)
-            authorToUpdate.update(author_id: pid, name: author['name'], orcid: author['orcid'], orcidStatus: author['orcidStatus'], works_count: author['works_count'], completed: true, updated_at: DateTime.now)
+          elsif Author.find_by(author_id: pid).completed == false || Author.find_by(author_id: pid).updated_at < 7.days.ago
+              authorToUpdate = Author.find_by(author_id: pid)
+              authorToUpdate.update(author_id: pid, name: author['name'], orcid: author['orcid'], orcidStatus: author['orcidStatus'], works_count: author['works_count'], completed: true, updated_at: DateTime.now)
+            end
           end
 
           url = ''
@@ -173,6 +174,9 @@ class Author < ApplicationRecord
 
           if(!Publication.exists?(publication_id: element['key']))
             pub = Publication.create(publication_id: element['key'], year: element['year'], title: element['title'], url: url, releaseDate: element['mdate'], articleType: element['type'], completed: false, updated_at: DateTime.now)
+          elsif Author.find_by(author_id: pid).updated_at < 7.days.ago
+            pub = Publication.find_by(publication_id: element['key'])
+            pub.update(year: element['year'], title: element['title'], url: url, releaseDate: element['mdate'], articleType: element['type'], completed: false, updated_at: DateTime.now)
           end
           Work.create(publication: Publication.find_by(publication_id: element['key']), author: Author.find_by(author_id: pid))
 
@@ -186,10 +190,11 @@ class Author < ApplicationRecord
                   end
               end
           end
-          end
-      end unless bibliography.nil?
+        end
+      unless bibliography.nil?
 
-      if author['orcid'] != '' && !author['orcid'].nil?
+      if Author.find_by(author_id: pid).completed == false || Author.find_by(author_id: pid).updated_at < 7.days.ago
+        if author['orcid'] != '' && !author['orcid'].nil?
           extraInformation = {}
           extraInformation['last_known_institution'] = {}
           extraInformation['summary_stats'] = {}
@@ -208,15 +213,17 @@ class Author < ApplicationRecord
                 cit = Citation.create(year: yearData['year'], citation_count: yearData['cited_by_count'], author: Author.find_by(author_id: pid), updated_at: DateTime.now)
             end
           end
+        end
       end
+    end
   end
 
   def self.getAuthor(pid)
-      if !Author.exists?(author_id: pid) || Author.find_by(author_id: pid).completed == false #|| Author.find_by(author_id: pid).updated_at > 1.day.ago
-          Author.getAuthorData(pid)
-      end
+    if !Author.exists?(author_id: pid) || Author.find_by(author_id: pid).completed == false || Author.find_by(author_id: pid).updated_at < 7.days.ago
+      Author.getAuthorData(pid)
+    end
 
-      Author.find_by(author_id: pid)
+    Author.find_by(author_id: pid)
   end
 
   def getWorks()
