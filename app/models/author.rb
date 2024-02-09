@@ -71,6 +71,10 @@ class Author < ApplicationRecord
       author['bibliography_types'] = {}
       author['bibliography_types_peryear'] = []
 
+      if authorresponse['dblpperson'].nil?
+        return nil
+      end
+
       urls = authorresponse['dblpperson']['person']['url']
       if !urls.nil? && urls.present?
         if urls.is_a?(Array)
@@ -220,7 +224,8 @@ class Author < ApplicationRecord
 
   def self.getAuthor(pid)
     if !Author.exists?(author_id: pid) || Author.find_by(author_id: pid).completed == false || Author.find_by(author_id: pid).updated_at < 7.days.ago
-      Author.getAuthorData(pid)
+      res = Author.getAuthorData(pid)
+      return res
     end
 
     Author.find_by(author_id: pid)

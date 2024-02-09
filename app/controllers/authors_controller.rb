@@ -58,6 +58,10 @@ class AuthorsController < ApplicationController
     @author['bibliography'] = {}
 
     author = Author.getAuthor(@pid)
+    if author.nil?
+      redirect_to '/authors'
+      return
+    end
 
     @author['name'] = author.name
     @author['orcid'] = author.orcid
