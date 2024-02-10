@@ -1,10 +1,53 @@
-<h1>Authors</h1>
+<style>
+  .search {
+    position: relative;
+    box-shadow: 0 0 40px rgba(51, 51, 51, .1);
+  }
+
+  .search input {
+    height: 60px;
+    text-indent: 25px;
+    border: 2px solid #d6d4d4;
+  }
+
+  .search input:focus{
+    box-shadow: none;
+    border: 2px solid blue;
+  }
+
+  .search .fa-search{
+    position: absolute;
+    top: 20px;
+    left: 16px;
+  }
+
+  .search button {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    height: 50px;
+    width: 110px;
+    background: blue;
+  }
+</style>
+
+<div class="px-4 py-5 my-5 text-center">
+  <h1 class="display-5 fw-bold text-body-emphasis">Authors</h1>
+</div>
+
 <%# Search Bar %>
-<%= form_tag authors_path, method: "GET" do %>
-  <%= label_tag :name %>
-  <%= text_field_tag :name, params[:name] %>
-  <%= submit_tag "Search" %>
-<% end %>
+<div class="container">
+  <div class="row height d-flex justify-content-center align-items-center">
+    <div class="col-md-8">
+      <form action="/authors" accept-charset="UTF-8" method="GET" class="search-form">
+        <div class="search">
+          <input type="text" name="name" id="name" value="<%= params[:name] %>" class="form-control" placeholder="Insert author name">
+          <button type="submit" name="commit" value="Search" class="btn btn-primary">Search</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
 
 <%# Result List %>
 <ul>
