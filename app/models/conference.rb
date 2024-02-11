@@ -75,7 +75,6 @@ class Conference < ApplicationRecord
         authors[1].each do |author|
           publicationAuthorsIds.push({'author_id' => author['author_id']})
         end
-        #authorsList = Author.where('author_id' => publicationAuthorsIds)
         if !(publicationAuthorsIds.empty?)
           Work.create_with(publication_id: authors[0]).insert_all(publicationAuthorsIds)
         end
@@ -83,7 +82,24 @@ class Conference < ApplicationRecord
     #check if the conference information has been updated in the last week, if so skip the update and query the database for the information
     elsif !(Conference.select(:updated_at).where(:conference_id=> conferenceId).first.updated_at <= DateTime.now.utc.end_of_day() - 7)
       information = Conference.getConferenceInformation(conferenceId)
-      #implement update of the conference informations
+      conference = Conference.where(:conference_id => conferenceId)
+      conference.publications.upsert_all(information[0])
+      allAuthorsArray = Array.new()
+      information[1].values.each do |info|
+        info.each do |author|
+          allAuthorsArray.push(author)
+        end
+      end
+      Author.create_with(completed: false).insert_all(allAuthorsArray)
+      information[1].each do |authors|
+        publicationAuthorsIds = Array.new()
+        authors[1].each do |author|
+          publicationAuthorsIds.push({'author_id' => author['author_id']})
+        end
+        if !(publicationAuthorsIds.empty?)
+          Work.create_with(publication_id: authors[0]).insert_all(publicationAuthorsIds)
+        end
+      end
     end
     conference = Conference.where(:conference_id => conferenceId)[0]
   end
