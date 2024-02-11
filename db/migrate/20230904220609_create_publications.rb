@@ -10,10 +10,9 @@ class CreatePublications < ActiveRecord::Migration[7.0]
       t.string :articleType
       t.date :releaseDate
       t.boolean :completed
-      
 
-      t.timestamps
       t.index :publication_id, unique: true
+      t.timestamps
     end
   end
 end

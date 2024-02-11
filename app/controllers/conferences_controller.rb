@@ -56,21 +56,6 @@ class ConferencesController < ApplicationController
     @conference['name'] = conference.name
 
     authorsList = Array.new()
-=begin
-    conference.publications.each do |publication|
-      publication.authors.each do |author|
-        if !(authorsList.include?(author.name))
-          authorInfo = Hash.new()
-          authorInfo[author.author_id] = author.name
-          authorsList.push(authorInfo)
-        end
-      end
-      if !(@years.include?(publication.year))
-        @years.push(publication.year)
-      end
-    end
-    # test di query singole per vedere se sono più veloci
-=end
     conference.publications.select(:year).distinct.each do |value|
       @years.push(value.year)
     end
