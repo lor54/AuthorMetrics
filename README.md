@@ -1,24 +1,18 @@
-# README
+# AuthorMetrics
 
-This README would normally document whatever steps are necessary to get the
-application up and running.
+The work was divided into 3 sections, one for each member of the group:
 
-Things you may want to cover:
+Filippo Serafini:
+* Conferences models and pages 
+* Tests
 
-* Ruby version
+Lorenzo Thomas Contessa:
+* Author models and pages 
+* Publication models and pages
+* Tests
 
-* System dependencies
-
-* Configuration
-
-* Database creation
-
-* Database initialization
-
-* How to run the test suite
-
-* Services (job queues, cache servers, search engines, etc.)
-
-* Deployment instructions
-
-* ...
+Matteo Peguri:
+* User models and pages
+* Follow models and pages
+* User Signup and Signin
+* Tests
