@@ -41,7 +41,7 @@
     <div class="col-md-8">
       <form action="/authors" accept-charset="UTF-8" method="GET" class="search-form">
         <div class="search">
-          <input type="text" name="name" id="name" value="<%= params[:name] %>" class="form-control" placeholder="Insert author name">
+          <input type="text" name="name" id="name" value="<%= params[:name] %>" class="form-control" placeholder="Inserisci nome autore">
           <button type="submit" name="commit" value="Search" class="btn btn-primary">Search</button>
         </div>
       </form>
@@ -49,38 +49,29 @@
   </div>
 </div>
 
-<%# Result List %>
-<ul>
-  <% if @authors.is_a? (Array) %>
-    <% @authors.each do |author| %>
-      <li>
-        <a href="/authors/<%= getUrlEncodedPid(author['info']['url']) %>"><%= author['info']['author'].html_safe %></a>
-      </li>
-    <% end %>
-  <% end %>
-</ul>
+<br>
 
-<%# Paginator %>
-<% if @pages > 0 %>
-  <div class="pagination">
-    <% if @page > 1 %>
-      <%= link_to "&laquo;".html_safe, authors_path(name: params[:name], page: @page-1) %>
-    <% else %>
-      <a class="active">&laquo;</a>
-    <% end %>
-
-    <% for i in @beginPages..@endPages do %>
-      <% if i == @page %>
-        <a class="active"><%= i %></a>
-      <% else %>
-        <%= link_to i.to_s, authors_path(name: params[:name], page: i) %>
-      <% end %>
-    <% end %>
-
-    <% if @page < @pages %>
-      <%= link_to "&raquo;".html_safe, authors_path(name: params[:name], page: @page+1) %>
-    <% else %>
-      <a class="active">&raquo;</a>
-    <% end %>
+<% if @authors.is_a? (Array) %>
+  <div class="container">
+    <div class="row height d-flex justify-content-center align-items-center">
+      <%# Result List %>
+      <div class="col-md-6">
+        <table class="table table-striped table-bordered">
+            <thead>
+                <tr>
+                  <th scope="col">Autore</th>
+                </tr>
+            </thead>
+            <tbody>
+                <% @authors.each do |author| %>
+                <tr>
+                    <td><a href="/authors/<%= getUrlEncodedPid(author['info']['url']) %>"><%= author['info']['author'].html_safe %></a></td>
+                </tr>
+                <% end %>
+            </tbody>
+        </table>
+        <%= will_paginate @authors, renderer: WillPaginate::ActionView::BootstrapLinkRenderer %>
+        </div>
+    </div>
   </div>
 <% end %>

@@ -32,6 +32,7 @@ class AuthorsController < ApplicationController
         @endPages = @beginPages == 1 ? 5 : @page
 
         @authors = authorsresponse['result']['hits']['hit']
+        @authors = @authors.paginate(:page => params[:page], :per_page => 5)
       end
     end
   end
