@@ -17,22 +17,11 @@ class AuthorsController < ApplicationController
 
       if authorsresponse['result']['status']['@code'] == '200'
         results = authorsresponse['result']['hits']['@sent'].to_i
-        @pages = results > 0 ? authorsresponse['result']['hits']['@total'].to_i / results : 0
-        if @pages <= 0
-          @endPages = @page
-        end
-
-        if params[:page].to_i <= @pages
-          @page = params[:page].to_i
-        else
-          redirect_to authors_path(name: params[:name], page: 1)
-        end
-
-        @beginPages = @page - @maxResultPages + 1 >= 1 ? @page - @maxResultPages + 1 : 1
-        @endPages = @beginPages == 1 ? 5 : @page
 
         @authors = authorsresponse['result']['hits']['hit']
-        @authors = @authors.paginate(:page => params[:page], :per_page => 5)
+        if !@authors.nil? 
+          @authors = @authors.paginate(:page => params[:page], :per_page => 5)
+        end
       end
     end
   end

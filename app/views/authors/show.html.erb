@@ -38,22 +38,22 @@
 <div class="container">
     <div class="row">
         <div class="col-md-2">
-            <h6> # Pubblicazioni: </h6>
+            <h6> # Publications: </h6>
             <p class="lead"><%= @author['works_count'] %></p>
-            <h6> # Citazioni: </h6>
+            <h6> # Citations: </h6>
             <p class="lead"><%= @author['citationNumber'] %></p>
             <h6> H-Index: </h6>
             <p class="lead"><%= @author['h_index'] %><br></p>
         </div>
         <div class="col-md-5">
             <% if @author['works_by_year'].keys.length > 0 %>
-                <h6> Numero di lavori per anno: </h6>
+                <h6> Works per year: </h6>
                 <%= column_chart @author['works_by_year'] %>
             <% end %>
         </div>
         <div class="col-md-5">
             <% if @author['citations_counts_by_year'].keys.length > 0 %>
-                <h6> Numero di citazioni per anno: </h6>
+                <h6> Citations number per year: </h6>
                 <%= column_chart @author['citations_counts_by_year'] %>
             <% end %>
         </div>
@@ -64,10 +64,10 @@
 
 <ul class="nav nav-tabs">
   <li class="nav-item">
-    <a class="nav-link<%= ' active' if @tab == 'publications' %>" aria-current="page" href="<%= authorPath(@pid, '')  %>">Pubblicazioni</a>
+    <a class="nav-link<%= ' active' if @tab == 'publications' %>" aria-current="page" href="<%= authorPath(@pid, '')  %>">Publications</a>
   </li>
   <li class="nav-item">
-    <a class="nav-link<%= ' active' if @tab == 'collaborations' %>" href="<%= authorPath(@pid, 'collaborations') %>">Collaborazioni</a>
+    <a class="nav-link<%= ' active' if @tab == 'collaborations' %>" href="<%= authorPath(@pid, 'collaborations') %>">Collaborations</a>
   </li>
 </ul>
 

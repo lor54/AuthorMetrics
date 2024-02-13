@@ -72,7 +72,7 @@ class Author < ApplicationRecord
       author['bibliography_types_peryear'] = []
 
       if authorresponse['dblpperson'].nil?
-        return nil
+        return 'none'
       end
 
       urls = authorresponse['dblpperson']['person']['url']
@@ -214,7 +214,7 @@ class Author < ApplicationRecord
             authorToUpdate.update(completed: true, updated_at: DateTime.now)
 
             extraInformation['counts_by_year'].each do |yearData|
-                cit = Citation.create(year: yearData['year'], citation_count: yearData['cited_by_count'], author: Author.find_by(author_id: pid), updated_at: DateTime.now)
+              cit = Citation.create(year: yearData['year'], citation_count: yearData['cited_by_count'], author: Author.find_by(author_id: pid), updated_at: DateTime.now)
             end
           end
         end
@@ -224,10 +224,9 @@ class Author < ApplicationRecord
 
   def self.getAuthor(pid)
     if !Author.exists?(author_id: pid) || Author.find_by(author_id: pid).completed == false || Author.find_by(author_id: pid).updated_at < 7.days.ago
-      res = Author.getAuthorData(pid)
-      return res
+      Author.getAuthorData(pid)
     end
-
+    
     Author.find_by(author_id: pid)
   end
 

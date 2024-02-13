@@ -60,7 +60,7 @@
     </div>
         <div>
         <% if @conference['publications'].group(:year).length > 0 %>
-                <h6> Numero di pubblicazioni per anno: </h6>
+                <h6> Publications per year: </h6>
                 <%= column_chart @conference['publications'].group(:year).count %>
         <% end %>
     </div>
