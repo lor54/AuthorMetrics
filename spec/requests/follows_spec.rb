@@ -25,7 +25,7 @@ RSpec.describe FollowsController, type: :request do
       sign_in user
       post author_follows_path('non_existent_author_id')
       expect(response).to redirect_to(authors_path)
-      expect(flash[:notice]).to eq('Author not found')
+      expect(flash[:alert]).to eq('Author not found')
     end
 
     it 'does not allow a user to follow the same author multiple times' do

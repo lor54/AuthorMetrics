@@ -12,7 +12,7 @@ RSpec.describe AuthorsController, type: :controller do
 
             it 'assigns authors and other instance variables' do
                 get :index, params: { name: author_name, page: 1 }
-                expect(assigns(:authors)).to be_an_instance_of(Array)
+                expect(assigns(:authors)).to be_an_instance_of(WillPaginate::Collection)
                 expect(assigns(:pages)).to be_an_instance_of(Integer)
             end
 
