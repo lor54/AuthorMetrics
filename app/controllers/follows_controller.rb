@@ -5,7 +5,7 @@ class FollowsController < ApplicationController
         id = params[:author_id]
         author = Author.where(author_id: params[:author_id]).first
         if author.nil?
-            flash[:notice] = "Author not found"
+            flash[:alert] = "Author not found"
             redirect_to authors_path
         else
             follow = Follow.where(user: current_user, author: author).first

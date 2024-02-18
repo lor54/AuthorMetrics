@@ -15,7 +15,7 @@
                         <%= button_to 'Unfollow', follow_path(follow), method: :delete, class: 'btn btn-primary' %>
                     <% end %>
                 <% end %>
-                <% if flash[:notice] && flash[:notice] != 'Successfully authenticated from Google account.' %>
+                <% if flash[:notice] && flash[:notice].include?('follow') %>
                     <div class="text-success mt-2"><%= flash[:notice] %></div>
                 <% end %>
 
