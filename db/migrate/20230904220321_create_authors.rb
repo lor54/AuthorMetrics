@@ -12,6 +12,7 @@ class CreateAuthors < ActiveRecord::Migration[7.0]
       t.string :last_known_institution_type
       t.string :last_known_institution_countrycode
       t.boolean :completed, default: false, null: false
+      t.boolean :otherInformations, default: false, null: false
 
 
       t.index :author_id, unique: true

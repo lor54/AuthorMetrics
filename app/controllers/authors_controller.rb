@@ -70,7 +70,6 @@ class AuthorsController < ApplicationController
     
     if author.orcid.nil? || author.orcid == ''
       @author['citationNumber'] = 'unavailable'
-      @author['works_count'] = 'unavailable'
       @author['h_index'] = 'unavailable'
       @author['last_known_institution'] = 'unavailable'
       @author['last_known_institution_type'] = 'unavailable'

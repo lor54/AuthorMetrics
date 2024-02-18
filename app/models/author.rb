@@ -160,7 +160,7 @@ class Author < ApplicationRecord
           end
 
           if !Author.exists?(author_id: pid)
-            createdAuthor = Author.create(author_id: pid, name: author['name'], orcid: author['orcid'], orcidStatus: author['orcidStatus'], works_count: author['works_count'], completed: true, updated_at: DateTime.now)
+            createdAuthor = Author.create(author_id: pid, name: author['name'], orcid: author['orcid'], orcidStatus: author['orcidStatus'], works_count: author['works_count'], completed: true, otherInformations: false, updated_at: DateTime.now)
           elsif Author.find_by(author_id: pid).completed == false || Author.find_by(author_id: pid).updated_at < 7.days.ago
               authorToUpdate = Author.find_by(author_id: pid)
               authorToUpdate.update(author_id: pid, name: author['name'], orcid: author['orcid'], orcidStatus: author['orcidStatus'], works_count: author['works_count'], completed: true, updated_at: DateTime.now)
@@ -197,7 +197,7 @@ class Author < ApplicationRecord
         end
       unless bibliography.nil?
 
-      if Author.find_by(author_id: pid).completed == false || Author.find_by(author_id: pid).updated_at < 7.days.ago
+      if Author.find_by(author_id: pid).otherInformations == false || Author.find_by(author_id: pid).updated_at < 7.days.ago
         if author['orcid'] != '' && !author['orcid'].nil?
           extraInformation = {}
           extraInformation['last_known_institution'] = {}
