@@ -16,3 +16,9 @@ Matteo Peguri:
 * Follow models and pages
 * User Signup and Signin
 * Tests
+
+How to use:
+* Download the code
+* Open the terminal in the folder and run the following coomands
+* Bundle install to install gems
+* Rails db:migrate to generate the database
